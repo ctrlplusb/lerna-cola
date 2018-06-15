@@ -1,0 +1,26 @@
+# lerna-cola
+/build
+/.webpackcache
+
+# Various OS / Runtimes / Node
+.DS_Store
+.lock-wscript
+.simeerc
+.vscode
+*.log
+*.pid
+*.seed
+flow-typed
+lerna-debug.log
+logs
+node_modules
+npm-debug.log
+pids
+Thumbs.db
+
+# Transpiled Packages
+packages/*/build
+
+# Generated files
+packages/*/.flowconfig
+

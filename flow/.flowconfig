@@ -1,0 +1,14 @@
+[ignore]
+build/
+node_modules/
+packages/*/build
+flow-typed/npm/execa*
+
+[include]
+flow-typed/npm
+
+[libs]
+
+[lints]
+
+[options]

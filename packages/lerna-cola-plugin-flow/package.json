@@ -1,0 +1,21 @@
+{
+  "version": "0.1.0",
+  "name": "lerna-cola-plugin-flow",
+  "description": "Flow plugin for lerna-cola projects.",
+  "repository": "https://github.com/ctrlplusb/lerna-cola",
+  "main": "build/index.js",
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "lerna-cola-dev-utils": "^0.1.0",
+    "flow-remove-types": "1.2.3",
+    "fs-extra": "6.0.1",
+    "globby": "8.0.1",
+    "p-limit": "2.0.0",
+    "ramda": "0.25.0"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.74.0"
+  }
+}

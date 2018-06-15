@@ -1,0 +1,70 @@
+{
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "node ./scripts/build.js && lerna-cola build",
+    "bootstrap": "yarn install && yarn build && yarn flow-types",
+    "flow-types": "rimraf projects/*/flow-typed && flow-mono create-symlinks flow/.flowconfig && flow-mono install-types",
+    "publish": "yarn run build && lerna publish"
+  },
+  "devDependencies": {
+    "babel-eslint": "8.2.3",
+    "eslint": "4.19.1",
+    "eslint-config-airbnb": "16.1.0",
+    "eslint-config-prettier": "2.9.0",
+    "eslint-plugin-import": "2.12.0",
+    "eslint-plugin-jsx-a11y": "6.0.3",
+    "eslint-plugin-react": "7.9.1",
+    "flow-mono-cli": "1.3.3",
+    "flow-remove-types": "^1.2.3",
+    "fs-extra": "^6.0.1",
+    "globby": "^8.0.1",
+    "lerna": "^2.11.0",
+    "p-limit": "^2.0.0",
+    "ramda": "^0.25.0",
+    "rimraf": "^2.6.2"
+  },
+  "eslintConfig": {
+    "root": true,
+    "parser": "babel-eslint",
+    "extends": [
+      "eslint-config-airbnb",
+      "eslint-config-prettier"
+    ],
+    "env": {
+      "browser": true,
+      "es6": true,
+      "node": true,
+      "jest": true
+    },
+    "ecmaFeatures": {
+      "defaultParams": true
+    },
+    "rules": {
+      "array-callback-return": 0,
+      "arrow-parens": [
+        "error",
+        "as-needed"
+      ],
+      "camelcase": 0,
+      "import/no-extraneous-dependencies": 0,
+      "import/prefer-default-export": 0,
+      "no-nested-ternary": 0,
+      "no-underscore-dangle": 0,
+      "prefer-destructuring": 0,
+      "react/forbid-prop-types": 0,
+      "react/jsx-filename-extension": 0,
+      "react/no-array-index-key": 0,
+      "react/no-did-mount-set-state": 0,
+      "react/no-find-dom-node": 0,
+      "react/sort-comp": 0
+    }
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "all"
+  }
+}

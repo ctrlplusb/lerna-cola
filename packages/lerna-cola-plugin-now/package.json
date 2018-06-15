@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "name": "lerna-cola-plugin-now",
+  "description": "Allows deployment of lerna-cola projects to Zeit's now",
+  "repository": "https://github.com/ctrlplusb/lerna-cola",
+  "main": "build/index.js",
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "chalk": "2.4.1",
+    "lerna-cola-dev-utils": "^0.1.0",
+    "dedent": "0.7.0",
+    "deepmerge": "2.1.1",
+    "p-whilst": "1.0.0",
+    "ramda": "0.25.0",
+    "temp-write": "3.4.0",
+    "write-json-file": "2.3.0"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.74.0"
+  }
+}

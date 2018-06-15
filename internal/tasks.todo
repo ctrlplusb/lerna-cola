@@ -1,0 +1,46 @@
+lerna-cola Roadmap / Todo:
+
+Bugs:
+
+Docs:
+  ☐ Intro
+  ☐ Video overview
+  ☐ Blog post
+  ☐ lerna-cola.js
+  ☐ Develop tips and tricks
+  ☐ SIGTERM/SIGINT effective usage
+  ☐ Usage of process.stdin.read() to stop process exiting (even though it has child processes)
+
+Features/Chores:
+  ☐ Change server develop plugin to use entry file, or use "main" via useMain flag.
+  ☐ Allow the ability to specify packages to be ignored by the development process (e.g. watching test libraries not useful and waste of resources).
+  ☐ Read the lerna config for package sources if none specified in lerna-cola config
+  ☐ rollup plugin
+  ☐ parceljs plugin
+  ☐ Better help on lerna-cola bin
+  ☐ Integration tests
+  ☐ Command hooks + error handling of them!
+   ✔ predevelop @done (2018-3-2 15:15:11)
+   ✔ postdevelop @done (2018-3-2 15:15:11)
+   ✔ pretest @done (2018-3-2 15:15:10)
+   ✔ posttest @done (2018-3-2 15:15:10)
+  ☐ Finish all inline TODO comments within code.
+  ☐ Enforce Node >=8.2.0 - i.e. bundled with npm@>=5.3.0
+  ☐ Plugin extension API
+  ☐ Validate the lerna-cola configuration (tcomb?)
+  ☐ Make the target browserlist configurable.
+  ☐ BrowserList configuration (touch point in babel and webpack config)
+  ☐ Chokidar events should result in the absolute minimal amount of work being done. e.g. transpile a single file. remove a dir, etc
+  ☐ auto-add source-map-support to build dependencies, and then re-enable for production builds.
+  ☐ plugin interface for compilers - pre/post compile
+  ☐ plugin interface for compilers - pre/post develop
+  ☐ Manual reload override for development mode (like nodemon rs).
+  ☐ Allow for explicit ignoring of a dependency when doing hot development reloads.
+
+Test:
+  ☐ Polyfill compilation to the following targets
+    ☐ Node
+    ☐ Browser
+       ☐ Chrome
+       ☐ IE 9
+       ☐ Safari

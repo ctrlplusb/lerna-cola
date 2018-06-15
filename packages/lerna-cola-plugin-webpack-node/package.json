@@ -1,0 +1,40 @@
+{
+  "version": "0.1.0",
+  "name": "lerna-cola-plugin-webpack-node",
+  "description": "Webpack (node targetting) plugin for lerna-cola projects.",
+  "repository": "https://github.com/ctrlplusb/lerna-cola",
+  "main": "build/index.js",
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "babel-core": "6.26.3",
+    "babel-loader": "7.1.4",
+    "babel-plugin-dynamic-import-node": "1.2.0",
+    "babel-plugin-syntax-trailing-function-commas": "6.22.0",
+    "babel-plugin-transform-class-properties": "6.24.1",
+    "babel-plugin-transform-object-rest-spread": "6.26.0",
+    "babel-plugin-transform-react-constant-elements": "6.23.0",
+    "babel-plugin-transform-react-inline-elements": "6.22.0",
+    "babel-plugin-transform-react-jsx-self": "6.22.0",
+    "babel-plugin-transform-react-jsx-source": "6.22.0",
+    "babel-plugin-transform-react-remove-prop-types": "0.4.13",
+    "babel-plugin-transform-runtime": "6.23.0",
+    "babel-preset-env": "1.7.0",
+    "babel-preset-react": "6.24.1",
+    "cache-loader": "1.2.2",
+    "lerna-cola-dev-utils": "^0.1.0",
+    "css-loader": "0.28.11",
+    "file-loader": "1.1.11",
+    "fs-extra": "^6.0.1",
+    "ramda": "0.25.0",
+    "read-pkg": "3.0.0",
+    "semver": "5.5.0",
+    "url-loader": "1.0.1",
+    "webpack": "4.12.0",
+    "webpack-node-externals": "1.7.2"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.74.0"
+  }
+}
