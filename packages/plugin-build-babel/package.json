@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "name": "@lerna-cola/plugin-build-babel",
   "description": "Babel plugin for lerna-cola projects.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
@@ -11,7 +11,7 @@
     "build"
   ],
   "dependencies": {
-    "@lerna-cola/lib": "^0.1.1",
+    "@lerna-cola/lib": "^0.1.2",
     "babel-core": "6.26.3",
     "fs-extra": "6.0.1",
     "globby": "8.0.1",
