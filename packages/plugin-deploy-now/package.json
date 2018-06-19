@@ -1,4 +1,5 @@
 {
+  "private": false,
   "version": "0.1.2",
   "name": "@lerna-cola/plugin-deploy-now",
   "description": "Allows deployment of lerna-cola projects to Zeit's now",
