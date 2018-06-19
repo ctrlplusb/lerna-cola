@@ -1,6 +1,4 @@
-# lerna-cola
-/build
-/.webpackcache
+/deprecated
 
 # Various OS / Runtimes / Node
 .DS_Store
