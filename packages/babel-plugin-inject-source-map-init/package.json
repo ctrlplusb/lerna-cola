@@ -1,6 +1,6 @@
 {
   "private": false,
-  "version": "0.26.5",
+  "version": "0.26.6",
   "name": "babel-plugin-inject-source-map-init",
   "description": "Injects a safe initialisation of source-map-support into your transpiled files",
   "main": "src/index.js",
