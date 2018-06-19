@@ -13,8 +13,7 @@
   },
   "main": "build/index.js",
   "files": [
-    "build",
-    "types"
+    "build"
   ],
   "dependencies": {
     "chalk": "2.4.1",
