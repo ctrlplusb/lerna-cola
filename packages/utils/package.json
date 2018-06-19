@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "@lerna-cola/utils",
   "description": "Helpful utilities for lerna-cola projects.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",

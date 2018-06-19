@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "name": "@lerna-cola/plugin-deploy-now",
   "description": "Allows deployment of lerna-cola projects to Zeit's now",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
@@ -11,8 +11,8 @@
     "build"
   ],
   "dependencies": {
+    "@lerna-cola/lib": "^0.1.1",
     "chalk": "2.4.1",
-    "@lerna-cola/lib": "^0.1.0",
     "dedent": "0.7.0",
     "deepmerge": "2.1.1",
     "p-whilst": "1.0.0",
