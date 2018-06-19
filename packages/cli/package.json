@@ -1,6 +1,6 @@
 {
   "private": false,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "name": "@lerna-cola/cli",
   "description": "The lerna-cola CLI.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
@@ -21,8 +21,8 @@
     "url": "https://github.com/ctrlplusb/lerna-cola/issues"
   },
   "dependencies": {
-    "@lerna-cola/lib": "^0.1.2",
-    "@lerna-cola/utils": "^0.1.2",
+    "@lerna-cola/lib": "^0.1.3",
+    "@lerna-cola/utils": "^0.1.3",
     "chokidar": "2.0.4",
     "dotenv": "6.0.0",
     "fs-extra": "6.0.1",
