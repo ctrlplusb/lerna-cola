@@ -29,10 +29,7 @@ async function buildFlowPackage(packageName) {
     process.cwd(),
     `./packages/${packageName}/build`,
   )
-  const sourceDir = path.resolve(
-    process.cwd(),
-    `./packages/${packageName}/build`,
-  )
+  const sourceDir = path.resolve(process.cwd(), `./packages/${packageName}/src`)
 
   const patterns = ['**/*.js', '!__tests__', '!test.js'].concat([
     '!node_modules/**/*',
@@ -66,9 +63,7 @@ async function buildFlowPackage(packageName) {
 
 console.log('Build Starting...')
 
-Promise.all(
-  flowPackages.map(({ pkg, options }) => buildFlowPackage(pkg, options)),
-).then(
+Promise.all(flowPackages.map(buildFlowPackage)).then(
   () => {
     console.log('Build Complete')
     process.exit(0)
