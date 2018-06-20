@@ -1,17 +1,24 @@
 // @flow
 
+import type {
+  PackageConductor,
+  PackageWatcher,
+} from '@lerna-cola/lib/build/types'
+
 const R = require('ramda')
-const { TerminalUtils, AppUtils } = require('@lerna-cola/lib')
+const { Config, TerminalUtils } = require('@lerna-cola/lib')
+
+type PackageWatchers = { [key: string]: PackageWatcher }
+type PackageConductors = { [key: string]: PackageConductor }
 
 module.exports = function gracefulShutdownManager(
-  packageDevelopConductors,
-  packageWatchers,
+  packageConductors: PackageConductors,
+  packageWatchers: PackageWatchers,
 ) {
   let shuttingDown = false
   let postDevelopRun = false
 
-  const appConfig = AppUtils.getConfig()
-  const postDevelopHook = R.path(['commands', 'develop', 'pre'], appConfig)
+  const postDevelopHook = R.path(['commands', 'develop', 'pre'], Config)
 
   const ensurePostDevelopHookRun = async () => {
     if (postDevelopHook && !postDevelopRun) {
@@ -51,7 +58,7 @@ module.exports = function gracefulShutdownManager(
 
       // Then call off the `.stop()` against all our package conductors.
       await Promise.all(
-        R.values(packageDevelopConductors).map(packageDevelopConductor =>
+        R.values(packageConductors).map(packageDevelopConductor =>
           packageDevelopConductor.stop(),
         ),
       )

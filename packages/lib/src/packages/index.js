@@ -3,18 +3,11 @@
 const buildPackage = require('./build-package')
 const cleanPackages = require('./clean-packages')
 const cleanPackage = require('./clean-package')
-const getAllPackages = require('./get-all-packages')
-const resolvePackages = require('./resolve-packages')
+const filterPackages = require('./filter-packages')
 
-/**
- * The PackageUtils API
- */
-const PackageUtils = {
+module.exports = {
   buildPackage,
   cleanPackages,
   cleanPackage,
-  getAllPackages,
-  resolvePackages,
+  filterPackages,
 }
-
-module.exports = PackageUtils

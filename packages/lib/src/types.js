@@ -4,11 +4,44 @@
 import type { ChildProcess } from 'child_process'
 import type { Chalk } from 'chalk'
 
+export type LernaColaPluginConfig =
+  | string
+  | {
+      name: string,
+      options: Object,
+    }
+
+export type LernaColaPackageConfig = {
+  name: string,
+  srcDir: string,
+  entryFile: string,
+  outputDir: string,
+  packageJson: Object,
+  buildPlugin?: LernaColaPluginConfig,
+  developPlugin?: LernaColaPluginConfig,
+  deployPlugin?: LernaColaPluginConfig,
+}
+
+export type LernaColaConfig = {
+  packageSources?: Array<string>,
+  packages: { [key: string]: LernaColaPackageConfig },
+  terminalLabelMinLength: number,
+}
+
 export type PackageVersions = { [string]: string }
 
 export type PackageWatcher = {
   start: () => void,
   stop: () => void,
+}
+
+export type PackageConductor = {
+  start: () => Promise<DevelopInstance>,
+  stop: () => Promise<void>,
+}
+
+export type DevelopInstance = {
+  kill: () => Promise<void>,
 }
 
 /**
@@ -27,53 +60,72 @@ export type PackagePaths = {
   packageWebpackCache: string,
 }
 
+export type PluginArgs = {
+  config: Config,
+}
+
+export type DevelopPluginArgs = PluginArgs & {
+  watcher: PackageWatcher,
+}
+
 export type BuildPlugin = {
   name: string,
-  clean: () => Promise<mixed>,
-  build: () => Promise<mixed>,
+  clean: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
+  build: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
 }
 
 export type DeployPath = string
 
 export type DeployPlugin = {
   name: string,
-  deploy: DeployPath => Promise<mixed>,
-}
-
-export type DevelopInstance = {
-  kill: () => Promise<void>,
+  deploy: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
 }
 
 export type DevelopPlugin = {
   name: string,
-  develop: PackageWatcher => Promise<DevelopInstance>,
+  develop: (
+    pkg: Package,
+    options: Object,
+    args: DevelopPluginArgs,
+  ) => Promise<DevelopInstance>,
 }
 
 export type PackagePlugins = {
-  buildPlugin: ?BuildPlugin,
-  deployPlugin: ?DeployPlugin,
-  developPlugin: ?DevelopPlugin,
+  buildPlugin?: {
+    plugin: BuildPlugin,
+    options: Object,
+  },
+  deployPlugin?: {
+    plugin: DeployPlugin,
+    options: Object,
+  },
+  developPlugin?: {
+    plugin: DevelopPlugin,
+    options: Object,
+  },
 }
 
-/**
- * A package meta object
- */
 export type Package = {
+  name: string,
   config: Object,
   color: Chalk,
+  allDependants: Array<string>,
   dependants: Array<string>,
   dependencies: Array<string>,
   devDependencies: Array<string>,
-  maxPackageNameLength: number,
-  name: string,
   packageJson: Object,
-  packageName: string,
   paths: PackagePaths,
   plugins: PackagePlugins,
   version: string,
 }
 
 export type PackageMap = { [string]: Package }
+
+export type Config = {
+  packages: Array<Package>,
+  packageMap: PackageMap,
+  terminalLabelMinLength: number,
+}
 
 declare module 'execa' {
   declare type ExecaChildProcess = ChildProcess & Promise<string, Error>

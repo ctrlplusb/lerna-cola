@@ -1,7 +1,6 @@
 // @flow
 
-const { TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
-const R = require('ramda')
+const { Config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 const pSeries = require('p-series')
 const asyncCommandHandler = require('../utils/async-command-handler')
 
@@ -13,10 +12,9 @@ module.exports = {
       if (!process.env.NODE_ENV) {
         process.env.NODE_ENV = 'production'
       }
-      TerminalUtils.title('Running build...')
-      const packages = await PackageUtils.getAllPackages()
+      TerminalUtils.title('Running build command...')
       const queueBuild = pkg => () => PackageUtils.buildPackage(pkg)
-      await pSeries(R.values(packages).map(queueBuild))
+      await pSeries(Config.packages.map(queueBuild))
       TerminalUtils.success('Done')
     } catch (ex) {
       TerminalUtils.error('Build failed', ex)

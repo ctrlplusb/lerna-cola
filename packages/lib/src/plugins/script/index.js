@@ -6,6 +6,7 @@ import type {
   BuildPlugin,
   DevelopPlugin,
   DeployPlugin,
+  DevelopInstance,
 } from '../../types'
 
 const R = require('ramda')
@@ -27,10 +28,45 @@ type ChildProcessMap = {
   },
 }
 
-module.exports = function scriptPlugin(
+const childProcessMap: ChildProcessMap = {
+  build: {},
+  clean: {},
+  develop: {},
+  deploy: {},
+}
+
+const addChildProcess = (
+  pkg: Package,
+  task: TaskName,
+  processInstance: ChildProcess,
+) => {
+  childProcessMap[task][pkg.name] = processInstance
+}
+
+const getChildProcess = (pkg: Package, task: TaskName) =>
+  childProcessMap[task][pkg.name]
+
+const killChildProcessFor = (pkg: Package, task: TaskName) => {
+  const childProcess = getChildProcess(pkg, task)
+  if (!childProcess) {
+    TerminalUtils.verbosePkg(pkg, `No running "${task}" script process to kill`)
+    return Promise.resolve()
+  }
+  return DevelopPluginUtils.killChildProcess(pkg, childProcess).then(() => {
+    TerminalUtils.verbosePkg(
+      pkg,
+      `Killed "${task}" script process successfully`,
+    )
+    if (childProcessMap[task]) {
+      delete childProcessMap[task]
+    }
+  })
+}
+
+const runScript = (task: TaskName) => async (
   pkg: Package,
   options: Options,
-): BuildPlugin & DevelopPlugin & DeployPlugin {
+) => {
   if (!options.scriptName || typeof options.scriptName !== 'string') {
     throw new Error(
       `No scriptName was provided for the develop configuration of ${
@@ -38,106 +74,75 @@ module.exports = function scriptPlugin(
       }.`,
     )
   }
-  const childProcessMap: ChildProcessMap = {
-    build: {},
-    clean: {},
-    develop: {},
-    deploy: {},
-  }
-
-  const addChildProcess = (task: TaskName, processInstance: ChildProcess) => {
-    childProcessMap[task][pkg.name] = processInstance
-  }
-
-  const getChildProcess = (task: TaskName) => childProcessMap[task][pkg.name]
-
-  const killChildProcessFor = (task: TaskName) => {
-    const childProcess = getChildProcess(task)
-    if (!childProcess) {
-      TerminalUtils.verbosePkg(
-        pkg,
-        `No running "${task}" script process to kill`,
-      )
-      return Promise.resolve()
-    }
-    return DevelopPluginUtils.killChildProcess(pkg, childProcess).then(() => {
-      TerminalUtils.verbosePkg(
-        pkg,
-        `Killed "${task}" script process successfully`,
-      )
-      if (childProcessMap[task]) {
-        delete childProcessMap[task]
-      }
-    })
-  }
 
   const pkgJson = readPkg.sync(pkg.paths.packageJson)
 
-  const runScript = (task: TaskName) => async () => {
-    const returnAPI = {
-      kill: () => killChildProcessFor(task),
-    }
+  const returnAPI: DevelopInstance = {
+    kill: () => killChildProcessFor(pkg, task),
+  }
 
-    const existingProcess = getChildProcess(task)
-    if (existingProcess && !options.runForEveryChange) {
-      return returnAPI
-    }
+  const existingProcess = getChildProcess(pkg, task)
+  if (existingProcess && !options.runForEveryChange) {
+    // $FlowFixMe
+    return task === 'develop' ? returnAPI : undefined
+  }
 
-    if (existingProcess) {
-      await killChildProcessFor(task)
-    }
+  if (existingProcess) {
+    await killChildProcessFor(pkg, task)
+  }
 
-    await new Promise((resolve, reject) => {
-      const scriptCmd = R.path(['scripts', options.scriptName], pkgJson)
-      if (!scriptCmd || R.isEmpty(scriptCmd)) {
-        throw new Error(
-          `Could not resolve script named "${options.scriptName}" on ${
-            pkg.name
-          }`,
-        )
-      }
-
-      TerminalUtils.infoPkg(pkg, `Executing script "${options.scriptName}"`)
-
-      const childProcess = ChildProcessUtils.execPkg(
-        pkg,
-        'npm',
-        ['run', options.scriptName],
-        {
-          cwd: pkg.paths.packageRoot,
-        },
+  await new Promise((resolve, reject) => {
+    const scriptCmd = R.path(['scripts', options.scriptName], pkgJson)
+    if (!scriptCmd || R.isEmpty(scriptCmd)) {
+      throw new Error(
+        `Could not resolve script named "${options.scriptName}" on ${pkg.name}`,
       )
+    }
 
-      childProcess.catch(err => {
-        TerminalUtils.verbosePkg(
-          pkg,
-          `Error executing script "${options.scriptName}"`,
-        )
-        reject(err)
-      })
+    TerminalUtils.infoPkg(pkg, `Executing script "${options.scriptName}"`)
 
-      // Give the catch above a tick of space, so that it can resolve any
-      // error that may have occurred
-      process.nextTick(() => {
-        childProcess.on('close', () => {
-          TerminalUtils.verbosePkg(
-            pkg,
-            `Stopped script "${options.scriptName}" process`,
-          )
-        })
-        addChildProcess(task, childProcess)
-        resolve()
-      })
+    const childProcess = ChildProcessUtils.execPkg(
+      pkg,
+      'npm',
+      ['run', options.scriptName],
+      {
+        cwd: pkg.paths.packageRoot,
+      },
+    )
+
+    childProcess.catch(err => {
+      TerminalUtils.verbosePkg(
+        pkg,
+        `Error executing script "${options.scriptName}"`,
+      )
+      reject(err)
     })
 
-    return returnAPI
-  }
+    // Give the catch above a tick of space, so that it can resolve any
+    // error that may have occurred
+    process.nextTick(() => {
+      childProcess.on('close', () => {
+        TerminalUtils.verbosePkg(
+          pkg,
+          `Stopped script "${options.scriptName}" process`,
+        )
+      })
+      addChildProcess(pkg, task, childProcess)
+      resolve()
+    })
+  })
 
-  return {
-    name: 'plugin-script',
-    build: runScript('build'),
-    clean: runScript('clean'),
-    develop: runScript('develop'),
-    deploy: runScript('deploy'),
-  }
+  // $FlowFixMe
+  return task === 'develop' ? returnAPI : undefined
 }
+
+const scriptPlugin: BuildPlugin & DevelopPlugin & DeployPlugin = {
+  name: 'plugin-script',
+  build: runScript('build'),
+  clean: runScript('clean'),
+  // $FlowFixMe
+  develop: runScript('develop'),
+  deploy: runScript('deploy'),
+}
+
+module.exports = scriptPlugin

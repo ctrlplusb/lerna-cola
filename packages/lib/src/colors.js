@@ -60,6 +60,7 @@ const nextColorPair = (): Chalk => {
   }
   const bg = background[bgIndex]
   const fg = foreground[fgIndex]
+  // $FlowFixMe
   return chalk[bg][fg]
 }
 

@@ -19,6 +19,9 @@ Plugins:
   ☐ parceljs
 
 Features:
+  ☐ Standard log messages should be prefixed as "lerna cola     |"
+  ☐ Move the maximum length of packages to the app config
+  ☐ When a change occurs in development server it should notify development conductor and plugins whether it came as a change on the package itself or from one of it's dependencies.
   ☐ Change server develop plugin to use entry file, or use "main" via useMain flag.
   ☐ Allow the ability to specify packages to be ignored by the development process (e.g. watching test libraries not useful and waste of resources).
   ☐ Read the lerna config for package sources if none specified in lerna-cola config

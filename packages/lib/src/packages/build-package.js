@@ -3,6 +3,7 @@
 import type { Package } from '../types'
 
 const TerminalUtils = require('../terminal')
+const Config = require('../config')
 
 type Options = {
   quiet?: boolean,
@@ -14,11 +15,15 @@ const executeBuild = pkg => {
   if (pkg.plugins.buildPlugin) {
     TerminalUtils.verbosePkg(
       pkg,
-      `Building using build plugin: ${pkg.plugins.buildPlugin.name}`,
+      `Building using build plugin: ${pkg.plugins.buildPlugin.plugin.name}`,
     )
   }
   return pkg.plugins.buildPlugin
-    ? pkg.plugins.buildPlugin.build()
+    ? pkg.plugins.buildPlugin.plugin.build(
+        pkg,
+        pkg.plugins.buildPlugin.options,
+        { config: Config },
+      )
     : Promise.resolve()
 }
 

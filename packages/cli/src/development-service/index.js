@@ -5,11 +5,7 @@
 import type { Package } from '@lerna-cola/lib/build/types'
 
 const R = require('ramda')
-const {
-  TerminalUtils,
-  AppUtils,
-  PackageUtils,
-} = require('@lerna-cola/lib')
+const { Config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 const createPackageConductor = require('./create-package-conductor')
 const createPackageWatcher = require('./create-package-watcher')
 const gracefulShutdownManager = require('./graceful-shutdown-manager')
@@ -18,19 +14,15 @@ module.exports = async function developmentService() {
   // Keep this message up here so it always comes before any others
   TerminalUtils.info('Press CTRL + C to exit')
 
-  const appConfig = AppUtils.getConfig()
-  const preDevelopHook = R.path(['commands', 'develop', 'pre'], appConfig)
+  const preDevelopHook = R.path(['commands', 'develop', 'pre'], Config)
 
   if (preDevelopHook) {
     TerminalUtils.info('Running the pre develop hook')
     await preDevelopHook()
   }
 
-  const packages = await PackageUtils.getAllPackages()
-  const packagesArray = R.values(packages)
-
   // Firstly clean build for all packages
-  await PackageUtils.cleanPackages(packagesArray)
+  await PackageUtils.cleanPackages(Config.packages)
 
   // Represents the current package being built
   let currentlyProcessing = null
@@ -45,7 +37,8 @@ module.exports = async function developmentService() {
   )
 
   // :: Package -> Array<Package>
-  const getPackageDependants = pkg => pkg.dependants.map(name => packages[name])
+  const getPackageDependants = pkg =>
+    pkg.dependants.map(name => Config.packageMap[name])
 
   // :: Package -> void -> void
   const onChange = pkg => () => {
@@ -58,7 +51,7 @@ module.exports = async function developmentService() {
   }
 
   // :: Object<string, PackageWatcher>
-  const packageWatchers = packagesArray.reduce(
+  const packageWatchers = Config.packages.reduce(
     (acc, pkg) =>
       Object.assign(acc, {
         [pkg.name]: createPackageWatcher(onChange(pkg), pkg),
@@ -67,7 +60,7 @@ module.exports = async function developmentService() {
   )
 
   // :: Object<string, PackageDevelopConductor>
-  const packageDevelopConductors = packagesArray.reduce(
+  const packageDevelopConductors = Config.packages.reduce(
     (acc, pkg) =>
       Object.assign(acc, {
         [pkg.name]: createPackageConductor(pkg, packageWatchers[pkg.name]),
@@ -161,7 +154,9 @@ module.exports = async function developmentService() {
   const processNextInTheQueue = () => {
     if (currentlyProcessing) {
       TerminalUtils.error(
-        `Tried to process the next Package in the queue even though there is a Package being processed: ${currentlyProcessing}`,
+        `Tried to process the next Package in the queue even though there is a Package being processed: ${
+          currentlyProcessing.name
+        }`,
       )
       return
     }
@@ -178,7 +173,7 @@ module.exports = async function developmentService() {
   }
 
   // READY...
-  packagesArray.forEach(queuePackageForProcessing)
+  Config.packages.forEach(queuePackageForProcessing)
 
   // SET...
   Object.keys(packageWatchers).forEach(packageName =>

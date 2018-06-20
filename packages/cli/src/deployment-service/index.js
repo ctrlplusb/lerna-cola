@@ -1,15 +1,13 @@
 // @flow
 
-const R = require('ramda')
+import type { Package } from '@lerna-cola/lib/build/types'
+
 const pSeries = require('p-series')
-const { TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
+const { Config, TerminalUtils } = require('@lerna-cola/lib')
 
 module.exports = async function deploymentService() {
-  const allPackages = PackageUtils.getAllPackages()
-  const allPackagesArray = R.values(allPackages)
-
-  const packagesWithDeployConfig = allPackagesArray.filter(
-    pkg => pkg.deployPlugin,
+  const packagesWithDeployConfig = Config.packages.filter(
+    pkg => !!pkg.plugins.deployPlugin,
   )
   if (packagesWithDeployConfig.length === 0) {
     TerminalUtils.info(
@@ -33,13 +31,22 @@ module.exports = async function deploymentService() {
     process.exit(0)
   }
 
-  const packagesToDeploy = namesOfPackagesToDeploy.map(x => allPackages[x])
+  const packagesToDeploy = namesOfPackagesToDeploy.map(
+    x => Config.packageMap[x],
+  )
 
   TerminalUtils.info('Deploying packages...')
 
   await pSeries(
-    packagesToDeploy.map(pkg => async () => {
-      await pkg.plugins.deployPlugin.deploy()
+    packagesToDeploy.map((pkg: Package) => async () => {
+      const deployPlugin = pkg.plugins.deployPlugin
+      if (!deployPlugin) {
+        return
+      }
+
+      await deployPlugin.plugin.deploy(pkg, deployPlugin.options, {
+        config: Config,
+      })
     }),
   )
 

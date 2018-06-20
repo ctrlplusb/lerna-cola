@@ -1,3 +1,5 @@
+// @flow
+
 // Prevent node process from exiting. (until CTRL + C or process.exit is called)
 // We do this to allow our scripts to respont to process exit events and do
 // cleaning up etc.

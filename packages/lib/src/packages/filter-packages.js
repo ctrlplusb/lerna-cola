@@ -3,8 +3,8 @@
 import type { Package } from '../types'
 
 const R = require('ramda')
+const Config = require('../config')
 const TerminalUtils = require('../terminal')
-const getAllPackages = require('./get-all-packages')
 
 /**
  * Filters the packages down to the given.
@@ -15,13 +15,13 @@ const getAllPackages = require('./get-all-packages')
  *
  * @return {Promise<Array<Package>>} The resolved packages
  */
-module.exports = async function resolvePackages(
+module.exports = function filterPackages(
   packageFilters: Array<string> = [],
-): Promise<Array<Package>> {
+): Array<Package> {
   TerminalUtils.verbose(
     `Resolving packages with filter [${packageFilters.join(', ')}]`,
   )
-  const packages = await getAllPackages()
+  const packages = Config.packages
   const packagesArray = R.values(packages)
   if (packagesArray.length === 0) {
     TerminalUtils.error('Could not find any packages.')
@@ -41,7 +41,7 @@ module.exports = async function resolvePackages(
             )
             process.exit(1)
           }
-          return packageFilters.map(x => packages[x])
+          return packageFilters.map(x => Config.packageMap[x])
         })()
   TerminalUtils.verbose(`Resolved: [${result.map(R.prop('name')).join(', ')}]`)
   return result

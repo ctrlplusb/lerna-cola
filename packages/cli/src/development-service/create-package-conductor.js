@@ -1,8 +1,12 @@
 // @flow
 
-import type { Package, PackageWatcher } from '@lerna-cola/lib/build/types'
+import type {
+  Package,
+  PackageWatcher,
+  PackageConductor,
+} from '@lerna-cola/lib/build/types'
 
-const { TerminalUtils } = require('@lerna-cola/lib')
+const { Config, TerminalUtils } = require('@lerna-cola/lib')
 
 const noPluginResult = {
   kill: () => Promise.resolve(),
@@ -11,13 +15,14 @@ const noPluginResult = {
 module.exports = function createPackageConductor(
   pkg: Package,
   watcher: PackageWatcher,
-) {
+): PackageConductor {
   let runningDevelopInstance
 
   return {
     // :: void -> Promise
     start: () => {
-      if (!pkg.plugins.developPlugin) {
+      const developPlugin = pkg.plugins.developPlugin
+      if (!developPlugin) {
         TerminalUtils.verbosePkg(
           pkg,
           `No develop plugin, skipping develop execution/conductor`,
@@ -27,10 +32,11 @@ module.exports = function createPackageConductor(
 
       TerminalUtils.verbosePkg(pkg, `Starting develop plugin`)
 
-      return pkg.plugins.developPlugin
-        .develop(watcher)
+      return developPlugin.plugin
+        .develop(pkg, developPlugin.options, { config: Config, watcher })
         .then(developInstance => {
           runningDevelopInstance = developInstance
+          return developInstance
         })
     },
 

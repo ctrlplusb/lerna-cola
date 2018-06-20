@@ -16,7 +16,7 @@ module.exports = {
       await developmentService()
       TerminalUtils.success('Done')
     } catch (ex) {
-      TerminalUtils.error('Build failed', ex)
+      TerminalUtils.error('Unhandled exception in development service', ex)
     }
   }),
 }
