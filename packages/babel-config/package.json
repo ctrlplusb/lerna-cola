@@ -1,6 +1,6 @@
 {
   "private": false,
-  "version": "0.1.6",
+  "version": "0.1.7",
   "name": "@lerna-cola/babel-config",
   "description": "A Babel config for the Babel build plugin for lerna-cola projects.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
@@ -12,9 +12,9 @@
     "build"
   ],
   "dependencies": {
-    "@lerna-cola/lib": "^0.1.6",
+    "@lerna-cola/lib": "^0.1.7",
     "babel-plugin-dynamic-import-node": "1.2.0",
-    "babel-plugin-inject-source-map-init": "^0.26.6",
+    "babel-plugin-inject-source-map-init": "^0.26.7",
     "babel-plugin-syntax-dynamic-import": "6.18.0",
     "babel-plugin-syntax-trailing-function-commas": "6.22.0",
     "babel-plugin-transform-class-properties": "6.24.1",

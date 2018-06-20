@@ -1,6 +1,6 @@
 {
   "private": false,
-  "version": "0.1.6",
+  "version": "0.1.7",
   "name": "@lerna-cola/plugin-build-flow",
   "description": "Flow plugin for lerna-cola projects.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
@@ -12,7 +12,7 @@
     "build"
   ],
   "dependencies": {
-    "@lerna-cola/lib": "^0.1.6",
+    "@lerna-cola/lib": "^0.1.7",
     "flow-remove-types": "1.2.3",
     "fs-extra": "6.0.1",
     "globby": "8.0.1",

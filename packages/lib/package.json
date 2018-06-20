@@ -1,6 +1,6 @@
 {
   "private": false,
-  "version": "0.1.6",
+  "version": "0.1.7",
   "name": "@lerna-cola/lib",
   "description": "The lib for lerna-cola packages.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
