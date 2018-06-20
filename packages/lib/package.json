@@ -1,5 +1,8 @@
 {
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.7",
   "name": "@lerna-cola/lib",
   "description": "The lib for lerna-cola packages.",
@@ -7,9 +10,6 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ctrlplusb/lerna-cola/issues"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "main": "build/index.js",
   "files": [

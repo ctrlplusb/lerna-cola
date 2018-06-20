@@ -1,5 +1,8 @@
 {
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.8",
   "name": "@lerna-cola/utils",
   "description": "Helpful utilities for lerna-cola projects.",

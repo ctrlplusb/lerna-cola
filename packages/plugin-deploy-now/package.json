@@ -1,12 +1,12 @@
 {
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.7",
   "name": "@lerna-cola/plugin-deploy-now",
   "description": "Allows deployment of lerna-cola projects to Zeit's now",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
-  "publishConfig": {
-    "access": "public"
-  },
   "main": "build/index.js",
   "files": [
     "build"

@@ -1,12 +1,12 @@
 {
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.7",
   "name": "@lerna-cola/plugin-build-babel",
   "description": "Babel plugin for lerna-cola projects.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
-  "publishConfig": {
-    "access": "public"
-  },
   "main": "build/index.js",
   "files": [
     "build"
