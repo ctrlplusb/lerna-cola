@@ -10,11 +10,12 @@ const globby = require('globby')
 const flowRemoveTypes = require('flow-remove-types')
 
 const flowPackages = [
-  'lerna-cola',
-  '@lerna-cola/lib',
-  '@lerna-cola/plugin-babel',
-  '@lerna-cola/plugin-flow',
-  '@lerna-cola/plugin-now',
+  'babel-config',
+  'cli',
+  'lib',
+  'plugin-build-babel',
+  'plugin-build-flow',
+  'plugin-deploy-now',
 ]
 const maxConcurrentTranspiles = os.cpus().length
 
