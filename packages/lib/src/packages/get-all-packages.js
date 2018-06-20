@@ -84,12 +84,8 @@ const resolvePluginFor = (pkg, type) => {
   if (pluginDef == null) {
     return null
   }
-  const config = Array.isArray(pluginDef)
-    ? {
-        name: pluginDef[0],
-        options: pluginDef.length > 1 ? pluginDef[1] : {},
-      }
-    : { name: pluginDef, options: {} }
+  const config =
+    typeof pluginDef === 'string' ? { name: pluginDef, options: {} } : pluginDef
   const pluginFactory = resolvePlugin(config.name)
   return pluginFactory(pkg, config.options)
 }
