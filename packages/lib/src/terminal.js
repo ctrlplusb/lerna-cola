@@ -50,7 +50,7 @@ const formatHeader = msg => chalk.bold(msg)
 
 function verbose(msg: string): void {
   if (process.env.VERBOSE) {
-    console.log(formatVerbose(msg))
+    console.log(StringUtils.lernaColaMsg(formatVerbose(msg)))
   }
 }
 
@@ -61,9 +61,9 @@ function verbosePkg(pkg: Package, msg: string): void {
 }
 
 function error(msg: string, err?: Error): void {
-  console.log(formatError(msg))
+  console.log(StringUtils.lernaColaMsg(formatError(msg)))
   if (err && err.stack) {
-    console.log(err.stack)
+    console.log(StringUtils.lernaColaMsg(StringUtils.lernaColaMsg(err.stack)))
   }
 }
 
@@ -75,7 +75,7 @@ function errorPkg(pkg: Package, msg: string, err?: Error): void {
 }
 
 function warning(msg: string): void {
-  console.log(formatWarning(msg))
+  console.log(StringUtils.lernaColaMsg(formatWarning(msg)))
 }
 
 function warningPkg(pkg: Package, msg: string): void {
@@ -83,7 +83,7 @@ function warningPkg(pkg: Package, msg: string): void {
 }
 
 function title(msg: string): void {
-  console.log(formatTitle(msg))
+  console.log(StringUtils.lernaColaMsg(formatTitle(msg)))
 }
 
 function titlePkg(pkg: Package, msg: string): void {
@@ -91,7 +91,7 @@ function titlePkg(pkg: Package, msg: string): void {
 }
 
 function info(msg: string): void {
-  console.log(formatInfo(msg))
+  console.log(StringUtils.lernaColaMsg(formatInfo(msg)))
 }
 
 function infoPkg(pkg: Package, msg: string): void {
@@ -99,7 +99,7 @@ function infoPkg(pkg: Package, msg: string): void {
 }
 
 function success(msg: string): void {
-  console.log(formatSuccess(msg))
+  console.log(StringUtils.lernaColaMsg(formatSuccess(msg)))
 }
 
 function successPkg(pkg: Package, msg: string): void {
@@ -107,7 +107,7 @@ function successPkg(pkg: Package, msg: string): void {
 }
 
 function header(msg: string): void {
-  console.log(formatHeader(msg))
+  console.log(StringUtils.lernaColaMsg(formatHeader(msg)))
 }
 
 function headerPkg(pkg: Package, msg: string): void {

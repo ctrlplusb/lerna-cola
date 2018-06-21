@@ -1,9 +1,11 @@
 // @flow
 
+import type { Chalk } from 'chalk'
 import type { Package } from './types'
 
 const { EOL } = require('os')
 const R = require('ramda')
+const chalk = require('chalk')
 const { removeNil, removeEmpty } = require('./arrays')
 const config = require('./config')
 
@@ -15,16 +17,26 @@ const multiLineStringToArray = (str: string): Array<string> =>
     removeEmpty,
   )(str)
 
-const packageMsg = (pkg: Package, msg: string) => {
-  const formattedPrefix = pkg.color(
-    `${pkg.name.padEnd(config().terminalLabelMinLength + 1)}|`,
+const prefixedMsg = (color: Chalk, prefix: string, msg: string) => {
+  const formattedPrefix = color(
+    `${prefix.padEnd(config().terminalLabelMinLength + 1)}|`,
   )
+
   return `${formattedPrefix} ${(msg || '')
     .toString()
     .replace(/\n/gi, `\n${formattedPrefix} `)}`
 }
 
+const lernaColaMsg = (msg: string): string => {
+  return prefixedMsg(chalk.bgRed.black, 'lerna-cola', msg)
+}
+
+const packageMsg = (pkg: Package, msg: string): string => {
+  return prefixedMsg(pkg.color, pkg.name, msg)
+}
+
 module.exports = {
+  lernaColaMsg,
   multiLineStringToArray,
   packageMsg,
 }
