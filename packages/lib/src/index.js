@@ -2,7 +2,7 @@
 
 const ArrayUtils = require('./arrays')
 const ChildProcessUtils = require('./childProcess')
-const Config = require('./config')
+const config = require('./config')
 const FnUtils = require('./fns')
 const FsUtils = require('./fs')
 const LogicUtils = require('./logic')
@@ -14,7 +14,7 @@ const TerminalUtils = require('./terminal')
 module.exports = {
   ArrayUtils,
   ChildProcessUtils,
-  Config,
+  config,
   FnUtils,
   FsUtils,
   LogicUtils,

@@ -11,6 +11,17 @@ export type LernaColaPluginConfig =
       options: Object,
     }
 
+export type CommandHooks = {
+  pre: () => Promise<void>,
+  post: () => Promise<void>,
+}
+
+export type LernaColaCommandsConfig = {
+  build?: CommandHooks,
+  develop?: CommandHooks,
+  deploy?: CommandHooks,
+}
+
 export type LernaColaPackageConfig = {
   name: string,
   srcDir: string,
@@ -20,6 +31,7 @@ export type LernaColaPackageConfig = {
   buildPlugin?: LernaColaPluginConfig,
   developPlugin?: LernaColaPluginConfig,
   deployPlugin?: LernaColaPluginConfig,
+  commands?: LernaColaCommandsConfig,
 }
 
 export type LernaColaConfig = {
@@ -122,6 +134,11 @@ export type Package = {
 export type PackageMap = { [string]: Package }
 
 export type Config = {
+  commands: {
+    build: CommandHooks,
+    develop: CommandHooks,
+    deploy: CommandHooks,
+  },
   packages: Array<Package>,
   packageMap: PackageMap,
   terminalLabelMinLength: number,

@@ -1,17 +1,21 @@
 // @flow
 
 /* eslint-disable no-console */
+/* eslint-disable global-require */
 
 import type { LernaColaPluginConfig, Package } from '../types'
 
 const R = require('ramda')
 const toposort = require('toposort')
-const resolvePlugin = require('../plugins/resolvePlugin')
+const path = require('path')
+const fs = require('fs-extra')
+
+const pluginCache = {}
 
 const allDeps = (pkg: Package) =>
   (pkg.dependencies || []).concat(pkg.devDependencies || [])
 
-export const getDependencies = (
+const getDependencies = (
   pkg: Package,
   packages: Array<Package>,
   dependencyType: 'dependencies' | 'devDependencies',
@@ -26,15 +30,10 @@ export const getDependencies = (
   }, [])
 }
 
-export const getDependants = (
-  pkg: Package,
-  packages: Array<Package>,
-): Array<string> =>
+const getDependants = (pkg: Package, packages: Array<Package>): Array<string> =>
   packages.filter(x => R.contains(pkg.name, allDeps(x))).map(R.prop('name'))
 
-export const orderByDependencies = (
-  packages: Array<Package>,
-): Array<Package> => {
+const orderByDependencies = (packages: Array<Package>): Array<Package> => {
   const packageDependencyGraph = pkg =>
     R.pipe(
       allDeps,
@@ -67,7 +66,7 @@ export const orderByDependencies = (
   )(packages)
 }
 
-export const getAllDependants = (
+const getAllDependants = (
   pkg: Package,
   packages: Array<Package>,
 ): Array<string> => {
@@ -92,7 +91,70 @@ export const getAllDependants = (
     .map(R.prop('name'))
 }
 
-export const getPlugin = (
+const resolvePackage = (packageName: string): mixed => {
+  const packagePath = require.resolve(packageName)
+  console.info(`Trying to resolve package ${packagePath}`)
+  let resolvedPackage
+  try {
+    // eslint-disable-next-line global-require,import/no-dynamic-require
+    resolvedPackage = require(packagePath)
+  } catch (err) {
+    console.info(`Failed to resolve package ${packagePath}`)
+    console.info(err)
+    console.info(`Trying to resolve package ${packagePath} as a symlink`)
+    // EEK! Could be a symlink?
+    try {
+      fs.lstatSync(packagePath)
+      const symLinkPath = fs.readlinkSync(path)
+      // eslint-disable-next-line global-require,import/no-dynamic-require
+      resolvedPackage = require(symLinkPath)
+    } catch (symErr) {
+      // DO nothing
+      console.info(`Failed to resolve package ${packagePath} as a symlink`)
+      console.info(symErr)
+    }
+  }
+
+  console.info(`Resolved package ${packagePath}`)
+
+  return resolvedPackage
+}
+
+const resolvePlugin = (pluginName: string) => {
+  if (R.isEmpty(pluginName) || R.isNil(pluginName)) {
+    throw new Error('No plugin name was given to resolvePlugin')
+  }
+
+  // Core plugins
+  switch (pluginName) {
+    case 'core-plugin-develop-build':
+      return require('../plugins/develop-build')
+    case 'core-plugin-develop-server':
+      return require('../plugins/develop-server')
+    case 'core-plugin-script':
+      return require('../plugins/script')
+    default:
+    // Do nothing, fall through and resolve custom plugin...
+  }
+
+  if (pluginCache[pluginName]) {
+    return pluginCache[pluginName]
+  }
+
+  const packagePlugin = resolvePackage(pluginName)
+
+  if (!packagePlugin) {
+    throw new Error(
+      `Could not resolve "${pluginName}" plugin. Make sure you have the plugin installed.`,
+    )
+  }
+
+  pluginCache[pluginName] = packagePlugin
+
+  return packagePlugin
+}
+
+const getPlugin = (
   packageName: string,
   pluginConfig: ?LernaColaPluginConfig,
   pluginType: string,
@@ -113,5 +175,16 @@ export const getPlugin = (
     console.error(`Failed to load "${pluginType}" for ${packageName}`)
     console.error(err)
     process.exit(1)
+    throw new Error('💩')
   }
+}
+
+module.exports = {
+  getAllDependants,
+  getDependants,
+  getDependencies,
+  getPlugin,
+  orderByDependencies,
+  resolvePackage,
+  resolvePlugin,
 }

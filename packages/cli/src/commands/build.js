@@ -1,6 +1,6 @@
 // @flow
 
-const { Config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
+const { config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 const pSeries = require('p-series')
 const asyncCommandHandler = require('../utils/async-command-handler')
 
@@ -14,7 +14,7 @@ module.exports = {
       }
       TerminalUtils.title('Running build command...')
       const queueBuild = pkg => () => PackageUtils.buildPackage(pkg)
-      await pSeries(Config.packages.map(queueBuild))
+      await pSeries(config().packages.map(queueBuild))
       TerminalUtils.success('Done')
     } catch (ex) {
       TerminalUtils.error('Build failed', ex)

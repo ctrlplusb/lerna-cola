@@ -6,7 +6,7 @@ const path = require('path')
 const TerminalUtils = require('../../terminal')
 const ChildProcessUtils = require('../../childProcess')
 const PackageUtils = require('../../packages')
-const DevelopPluginUtils = require('../utils')
+const PluginUtils = require('../utils')
 
 const childProcessMap = {}
 
@@ -17,7 +17,7 @@ const killChildProcessFor = (pkg: Package): Promise<void> => {
     return Promise.resolve()
   }
 
-  return DevelopPluginUtils.killChildProcess(pkg, childProcess).then(() => {
+  return PluginUtils.killChildProcess(pkg, childProcess).then(() => {
     TerminalUtils.verbose(`${pkg.name} killed successfully`)
     if (childProcessMap[pkg.name]) {
       delete childProcessMap[pkg.name]

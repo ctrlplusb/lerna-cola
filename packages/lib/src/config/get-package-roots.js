@@ -38,10 +38,10 @@ module.exports = function resolvePackageRoots(
     )
   }
 
-  const results = globby
+  return globby
     .sync(
       packageSources.map(
-        globPath => path.join(globPath, 'package.json'),
+        globPath => path.join(process.cwd(), globPath, 'package.json'),
         globOpts,
       ),
     )
@@ -53,11 +53,4 @@ module.exports = function resolvePackageRoots(
       const packageDir = path.dirname(packageConfigPath)
       return packageDir
     })
-
-  // re-sort by absolute path
-  const lexicalByLocation = (a, b) => a.localeCompare(b)
-  return results.reduce(
-    (pkgs, result) => pkgs.concat(result.sort(lexicalByLocation)),
-    [],
-  )
 }

@@ -3,10 +3,10 @@
 import type { Package } from '@lerna-cola/lib/build/types'
 
 const pSeries = require('p-series')
-const { Config, TerminalUtils } = require('@lerna-cola/lib')
+const { config, TerminalUtils } = require('@lerna-cola/lib')
 
 module.exports = async function deploymentService() {
-  const packagesWithDeployConfig = Config.packages.filter(
+  const packagesWithDeployConfig = config().packages.filter(
     pkg => !!pkg.plugins.deployPlugin,
   )
   if (packagesWithDeployConfig.length === 0) {
@@ -32,7 +32,7 @@ module.exports = async function deploymentService() {
   }
 
   const packagesToDeploy = namesOfPackagesToDeploy.map(
-    x => Config.packageMap[x],
+    x => config().packageMap[x],
   )
 
   TerminalUtils.info('Deploying packages...')
@@ -45,7 +45,7 @@ module.exports = async function deploymentService() {
       }
 
       await deployPlugin.plugin.deploy(pkg, deployPlugin.options, {
-        config: Config,
+        config: config(),
       })
     }),
   )

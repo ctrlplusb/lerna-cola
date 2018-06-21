@@ -13,7 +13,7 @@ const R = require('ramda')
 const readPkg = require('read-pkg')
 const TerminalUtils = require('../../terminal')
 const ChildProcessUtils = require('../../childProcess')
-const DevelopPluginUtils = require('../utils')
+const PluginUtils = require('../utils')
 
 type Options = {|
   scriptName: string,
@@ -52,7 +52,7 @@ const killChildProcessFor = (pkg: Package, task: TaskName) => {
     TerminalUtils.verbosePkg(pkg, `No running "${task}" script process to kill`)
     return Promise.resolve()
   }
-  return DevelopPluginUtils.killChildProcess(pkg, childProcess).then(() => {
+  return PluginUtils.killChildProcess(pkg, childProcess).then(() => {
     TerminalUtils.verbosePkg(
       pkg,
       `Killed "${task}" script process successfully`,

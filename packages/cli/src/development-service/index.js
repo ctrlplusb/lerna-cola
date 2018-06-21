@@ -5,7 +5,7 @@
 import type { Package } from '@lerna-cola/lib/build/types'
 
 const R = require('ramda')
-const { Config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
+const { config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 const createPackageConductor = require('./create-package-conductor')
 const createPackageWatcher = require('./create-package-watcher')
 const gracefulShutdownManager = require('./graceful-shutdown-manager')
@@ -14,15 +14,13 @@ module.exports = async function developmentService() {
   // Keep this message up here so it always comes before any others
   TerminalUtils.info('Press CTRL + C to exit')
 
-  const preDevelopHook = R.path(['commands', 'develop', 'pre'], Config)
+  const preDevelopHook = config().commands.develop.pre
 
-  if (preDevelopHook) {
-    TerminalUtils.info('Running the pre develop hook')
-    await preDevelopHook()
-  }
+  TerminalUtils.info('Running the pre develop hook')
+  await preDevelopHook()
 
   // Firstly clean build for all packages
-  await PackageUtils.cleanPackages(Config.packages)
+  await PackageUtils.cleanPackages(config().packages)
 
   // Represents the current package being built
   let currentlyProcessing = null
@@ -38,7 +36,7 @@ module.exports = async function developmentService() {
 
   // :: Package -> Array<Package>
   const getPackageDependants = pkg =>
-    pkg.dependants.map(name => Config.packageMap[name])
+    pkg.dependants.map(name => config().packageMap[name])
 
   // :: Package -> void -> void
   const onChange = pkg => () => {
@@ -51,7 +49,7 @@ module.exports = async function developmentService() {
   }
 
   // :: Object<string, PackageWatcher>
-  const packageWatchers = Config.packages.reduce(
+  const packageWatchers = config().packages.reduce(
     (acc, pkg) =>
       Object.assign(acc, {
         [pkg.name]: createPackageWatcher(onChange(pkg), pkg),
@@ -60,7 +58,7 @@ module.exports = async function developmentService() {
   )
 
   // :: Object<string, PackageDevelopConductor>
-  const packageDevelopConductors = Config.packages.reduce(
+  const packageDevelopConductors = config().packages.reduce(
     (acc, pkg) =>
       Object.assign(acc, {
         [pkg.name]: createPackageConductor(pkg, packageWatchers[pkg.name]),
@@ -173,7 +171,7 @@ module.exports = async function developmentService() {
   }
 
   // READY...
-  Config.packages.forEach(queuePackageForProcessing)
+  config().packages.forEach(queuePackageForProcessing)
 
   // SET...
   Object.keys(packageWatchers).forEach(packageName =>

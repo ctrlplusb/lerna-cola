@@ -6,7 +6,7 @@ import type {
   PackageConductor,
 } from '@lerna-cola/lib/build/types'
 
-const { Config, TerminalUtils } = require('@lerna-cola/lib')
+const { config, TerminalUtils } = require('@lerna-cola/lib')
 
 const noPluginResult = {
   kill: () => Promise.resolve(),
@@ -33,7 +33,7 @@ module.exports = function createPackageConductor(
       TerminalUtils.verbosePkg(pkg, `Starting develop plugin`)
 
       return developPlugin.plugin
-        .develop(pkg, developPlugin.options, { config: Config, watcher })
+        .develop(pkg, developPlugin.options, { config: config(), watcher })
         .then(developInstance => {
           runningDevelopInstance = developInstance
           return developInstance

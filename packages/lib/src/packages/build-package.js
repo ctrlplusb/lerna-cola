@@ -3,7 +3,7 @@
 import type { Package } from '../types'
 
 const TerminalUtils = require('../terminal')
-const Config = require('../config')
+const config = require('../config')
 
 type Options = {
   quiet?: boolean,
@@ -22,7 +22,7 @@ const executeBuild = pkg => {
     ? pkg.plugins.buildPlugin.plugin.build(
         pkg,
         pkg.plugins.buildPlugin.options,
-        { config: Config },
+        { config: config() },
       )
     : Promise.resolve()
 }

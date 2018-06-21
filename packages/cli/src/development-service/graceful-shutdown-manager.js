@@ -6,7 +6,7 @@ import type {
 } from '@lerna-cola/lib/build/types'
 
 const R = require('ramda')
-const { Config, TerminalUtils } = require('@lerna-cola/lib')
+const { config, TerminalUtils } = require('@lerna-cola/lib')
 
 type PackageWatchers = { [key: string]: PackageWatcher }
 type PackageConductors = { [key: string]: PackageConductor }
@@ -18,7 +18,7 @@ module.exports = function gracefulShutdownManager(
   let shuttingDown = false
   let postDevelopRun = false
 
-  const postDevelopHook = R.path(['commands', 'develop', 'pre'], Config)
+  const postDevelopHook = config().commands.develop.pre
 
   const ensurePostDevelopHookRun = async () => {
     if (postDevelopHook && !postDevelopRun) {

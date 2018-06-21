@@ -5,7 +5,7 @@ import type { Package } from './types'
 const { EOL } = require('os')
 const R = require('ramda')
 const { removeNil, removeEmpty } = require('./arrays')
-const Config = require('./config')
+const config = require('./config')
 
 const multiLineStringToArray = (str: string): Array<string> =>
   R.pipe(
@@ -17,7 +17,7 @@ const multiLineStringToArray = (str: string): Array<string> =>
 
 const packageMsg = (pkg: Package, msg: string) => {
   const formattedPrefix = pkg.color(
-    `${pkg.name.padEnd(Config.terminalLabelMinLength + 1)}|`,
+    `${pkg.name.padEnd(config().terminalLabelMinLength + 1)}|`,
   )
   return `${formattedPrefix} ${(msg || '')
     .toString()

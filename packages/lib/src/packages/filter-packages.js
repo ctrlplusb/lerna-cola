@@ -3,7 +3,7 @@
 import type { Package } from '../types'
 
 const R = require('ramda')
-const Config = require('../config')
+const config = require('../config')
 const TerminalUtils = require('../terminal')
 
 /**
@@ -21,7 +21,7 @@ module.exports = function filterPackages(
   TerminalUtils.verbose(
     `Resolving packages with filter [${packageFilters.join(', ')}]`,
   )
-  const packages = Config.packages
+  const packages = config().packages
   const packagesArray = R.values(packages)
   if (packagesArray.length === 0) {
     TerminalUtils.error('Could not find any packages.')
@@ -41,7 +41,7 @@ module.exports = function filterPackages(
             )
             process.exit(1)
           }
-          return packageFilters.map(x => Config.packageMap[x])
+          return packageFilters.map(x => config().packageMap[x])
         })()
   TerminalUtils.verbose(`Resolved: [${result.map(R.prop('name')).join(', ')}]`)
   return result
