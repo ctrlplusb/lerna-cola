@@ -48,9 +48,14 @@ const orderByDependencies = (packages: Array<Package>): Array<Package> => {
     R.map(R.prop('name')),
   )(packages)
 
-  const findPackageByName: (Array<string>) => Array<Package> = R.map(name =>
-    packages.find(x => x.name === name),
-  ).filter(x => x != null)
+  const findPackageByName = (packageNames: Array<string>): Array<Package> =>
+    packageNames.reduce((acc, name) => {
+      const found = packages.find(x => x.name === name)
+      if (found != null) {
+        return [...acc, found]
+      }
+      return acc
+    }, [])
 
   return R.pipe(
     dependencyGraph,

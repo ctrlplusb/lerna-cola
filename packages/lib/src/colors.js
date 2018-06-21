@@ -5,8 +5,6 @@ import type { Chalk } from 'chalk'
 const chalk = require('chalk')
 
 const foreground = [
-  'black',
-  'red',
   'green',
   'yellow',
   'blue',
@@ -21,11 +19,11 @@ const foreground = [
   'magentaBright',
   'cyanBright',
   'whiteBright',
+  'black',
+  'red',
 ]
 
 const background = [
-  'bgBlack',
-  'bgRed',
   'bgGreen',
   'bgYellow',
   'bgBlue',
@@ -40,6 +38,8 @@ const background = [
   'bgMagentaBright',
   'bgCyanBright',
   'bgWhiteBright',
+  'bgBlack',
+  'bgRed',
 ]
 
 let bgIndex = 0

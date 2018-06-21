@@ -18,9 +18,9 @@ const multiLineStringToArray = (str: string): Array<string> =>
   )(str)
 
 const prefixedMsg = (color: Chalk, prefix: string, msg: string): string => {
-  const formattedPrefix = color(
-    `${prefix.padEnd(config().terminalLabelMinLength + 1)}|`,
-  )
+  const formattedPrefix = `${color(
+    `${prefix.padEnd(config().terminalLabelMinLength + 1)}`,
+  )}|`
 
   return `${formattedPrefix} ${(msg || '')
     .toString()
@@ -28,7 +28,7 @@ const prefixedMsg = (color: Chalk, prefix: string, msg: string): string => {
 }
 
 const lernaColaMsg = (msg: string): string =>
-  prefixedMsg(chalk.bgRed.black, 'lerna-cola', msg)
+  prefixedMsg(chalk.bgBlack.gray, 'lerna-cola', msg)
 
 const packageMsg = (pkg: Package, msg: string): string =>
   prefixedMsg(pkg.color, pkg.name, msg)
