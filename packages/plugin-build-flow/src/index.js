@@ -1,6 +1,10 @@
 // @flow
 
-import type { Package, BuildPlugin } from '@lerna-cola/lib/build/types'
+import type {
+  Package,
+  CleanPlugin,
+  BuildPlugin,
+} from '@lerna-cola/lib/build/types'
 
 const os = require('os')
 const path = require('path')
@@ -23,7 +27,7 @@ type PluginOptions = {
   inputs?: Array<string>,
 }
 
-const flowBuildPlugin: BuildPlugin = {
+const flowBuildPlugin: CleanPlugin & BuildPlugin = {
   name: '@lerna-cola/plugin-build-flow',
   build: (pkg: Package, options: PluginOptions) => {
     const patterns = (

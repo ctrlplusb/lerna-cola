@@ -233,11 +233,11 @@ Plugins are split by "core" plugins, which are bundled with the `@lerna-cola/cor
 
 ### Core Plugins
 
-#### `plugin-script`
+#### `core-plugin-develop-server`
 
 > TODO
 
-#### `plugin-develop-server`
+#### `core-plugin-script`
 
 > TODO
 

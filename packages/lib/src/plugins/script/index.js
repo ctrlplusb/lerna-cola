@@ -3,6 +3,7 @@
 import type { ChildProcess } from 'child_process'
 import type {
   Package,
+  CleanPlugin,
   BuildPlugin,
   DevelopPlugin,
   DeployPlugin,
@@ -136,7 +137,7 @@ const runScript = (task: TaskName) => async (
   return task === 'develop' ? returnAPI : undefined
 }
 
-const scriptPlugin: BuildPlugin & DevelopPlugin & DeployPlugin = {
+const scriptPlugin: CleanPlugin & BuildPlugin & DevelopPlugin & DeployPlugin = {
   name: 'plugin-script',
   build: runScript('build'),
   clean: runScript('clean'),

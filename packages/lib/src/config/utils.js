@@ -7,10 +7,7 @@ import type { LernaColaPluginConfig, Package } from '../types'
 
 const R = require('ramda')
 const toposort = require('toposort')
-const path = require('path')
-const fs = require('fs-extra')
-
-const pluginCache = {}
+const resolvePlugin = require('../plugins/resolve-plugin')
 
 const allDeps = (pkg: Package) =>
   (pkg.dependencies || []).concat(pkg.devDependencies || [])
@@ -90,69 +87,6 @@ const getAllDependants = (
     .map(R.prop('name'))
 }
 
-const resolvePackage = (packageName: string): mixed => {
-  const packagePath = require.resolve(packageName)
-  console.info(`Trying to resolve package ${packagePath}`)
-  let resolvedPackage
-  try {
-    // eslint-disable-next-line global-require,import/no-dynamic-require
-    resolvedPackage = require(packagePath)
-  } catch (err) {
-    console.info(`Failed to resolve package ${packagePath}`)
-    console.info(err)
-    console.info(`Trying to resolve package ${packagePath} as a symlink`)
-    // EEK! Could be a symlink?
-    try {
-      fs.lstatSync(packagePath)
-      const symLinkPath = fs.readlinkSync(path)
-      // eslint-disable-next-line global-require,import/no-dynamic-require
-      resolvedPackage = require(symLinkPath)
-    } catch (symErr) {
-      // DO nothing
-      console.info(`Failed to resolve package ${packagePath} as a symlink`)
-      console.info(symErr)
-    }
-  }
-
-  console.info(`Resolved package ${packagePath}`)
-
-  return resolvedPackage
-}
-
-const resolvePlugin = (pluginName: string) => {
-  if (R.isEmpty(pluginName) || R.isNil(pluginName)) {
-    throw new Error('No plugin name was given to resolvePlugin')
-  }
-
-  // Core plugins
-  switch (pluginName) {
-    case 'core-plugin-develop-build':
-      return require('../plugins/develop-build')
-    case 'core-plugin-develop-server':
-      return require('../plugins/develop-server')
-    case 'core-plugin-script':
-      return require('../plugins/script')
-    default:
-    // Do nothing, fall through and resolve custom plugin...
-  }
-
-  if (pluginCache[pluginName]) {
-    return pluginCache[pluginName]
-  }
-
-  const packagePlugin = resolvePackage(pluginName)
-
-  if (!packagePlugin) {
-    throw new Error(
-      `Could not resolve "${pluginName}" plugin. Make sure you have the plugin installed.`,
-    )
-  }
-
-  pluginCache[pluginName] = packagePlugin
-
-  return packagePlugin
-}
-
 const getPlugin = (
   packageName: string,
   pluginConfig: ?LernaColaPluginConfig,
@@ -184,6 +118,4 @@ module.exports = {
   getDependencies,
   getPlugin,
   orderByDependencies,
-  resolvePackage,
-  resolvePlugin,
 }

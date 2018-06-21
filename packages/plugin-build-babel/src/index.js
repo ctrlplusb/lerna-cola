@@ -1,6 +1,10 @@
 // @flow
 
-import type { Package, BuildPlugin } from '@lerna-cola/lib/build/types'
+import type {
+  Package,
+  CleanPlugin,
+  BuildPlugin,
+} from '@lerna-cola/lib/build/types'
 
 const path = require('path')
 const babel = require('babel-core')
@@ -35,7 +39,7 @@ type SanitisedOptions = {
   config: Object,
 }
 
-const babelBuildPlugin: BuildPlugin = {
+const babelBuildPlugin: CleanPlugin & BuildPlugin = {
   name: '@lerna-cola/plugin-build-babel',
   build: (pkg: Package, options: Options) => {
     const sanitiseOptions = (opts: Options): SanitisedOptions => {

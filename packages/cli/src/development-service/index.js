@@ -2,7 +2,11 @@
 
 /* eslint-disable no-use-before-define */
 
-import type { Package } from '@lerna-cola/lib/build/types'
+import type {
+  Package,
+  PackageConductor,
+  PackageWatcher,
+} from '@lerna-cola/lib/build/types'
 
 const R = require('ramda')
 const { config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
@@ -28,18 +32,15 @@ module.exports = async function developmentService() {
   // Represents the build backlog queue. FIFO.
   let toProcessQueue: Array<Package> = []
 
-  // :: Package -> Package -> bool
-  const packageHasDependant = R.curry(
+  const packageHasDependant: Package => Package => boolean = R.curry(
     (dependant: Package, pkg: Package): boolean =>
       R.contains(dependant.name, pkg.dependants),
   )
 
-  // :: Package -> Array<Package>
-  const getPackageDependants = pkg =>
+  const getPackageDependants = (pkg: Package): Array<Package> =>
     pkg.dependants.map(name => config().packageMap[name])
 
-  // :: Package -> void -> void
-  const onChange = pkg => () => {
+  const onChange = (pkg: Package) => (): void => {
     queuePackageForProcessing(pkg)
     // If no active build running then we will call off to run next item in
     // the queue.
@@ -48,8 +49,9 @@ module.exports = async function developmentService() {
     }
   }
 
-  // :: Object<string, PackageWatcher>
-  const packageWatchers = config().packages.reduce(
+  const packageWatchers: {
+    [key: string]: PackageWatcher,
+  } = config().packages.reduce(
     (acc, pkg) =>
       Object.assign(acc, {
         [pkg.name]: createPackageWatcher(onChange(pkg), pkg),
@@ -57,8 +59,9 @@ module.exports = async function developmentService() {
     {},
   )
 
-  // :: Object<string, PackageDevelopConductor>
-  const packageDevelopConductors = config().packages.reduce(
+  const packageDevelopConductors: {
+    [key: string]: PackageConductor,
+  } = config().packages.reduce(
     (acc, pkg) =>
       Object.assign(acc, {
         [pkg.name]: createPackageConductor(pkg, packageWatchers[pkg.name]),
@@ -66,11 +69,14 @@ module.exports = async function developmentService() {
     {},
   )
 
-  const queuePackageForProcessing = packageToQueue => {
+  const queuePackageForProcessing = (
+    packageToQueue: Package,
+    originatingPackage?: Package,
+  ): void => {
     TerminalUtils.verbose(`Attempting to queue ${packageToQueue.name}`)
     if (
       currentlyProcessing !== null &&
-      packageHasDependant(packageToQueue, currentlyProcessing)
+      packageHasDependant(packageToQueue)(currentlyProcessing)
     ) {
       // Do nothing as the package currently being built will result in this
       // package being built via it's dependancy chain.
@@ -101,7 +107,7 @@ module.exports = async function developmentService() {
     }
   }
 
-  const processPackage = pkg => {
+  const processPackage = (pkg: Package): void => {
     currentlyProcessing = pkg
     const packageDevelopConductor = packageDevelopConductors[pkg.name]
     if (!packageDevelopConductor) {
@@ -138,7 +144,7 @@ module.exports = async function developmentService() {
             `Develop process ran successfully, queueing dependants...`,
           )
           const packageDependants = getPackageDependants(pkg)
-          packageDependants.forEach(queuePackageForProcessing)
+          packageDependants.forEach(dep => queuePackageForProcessing(dep, pkg))
         }
 
         // We will call off the next item to be processe even if a failure
@@ -149,7 +155,7 @@ module.exports = async function developmentService() {
       })
   }
 
-  const processNextInTheQueue = () => {
+  const processNextInTheQueue = (): void => {
     if (currentlyProcessing) {
       TerminalUtils.error(
         `Tried to process the next Package in the queue even though there is a Package being processed: ${
@@ -171,7 +177,7 @@ module.exports = async function developmentService() {
   }
 
   // READY...
-  config().packages.forEach(queuePackageForProcessing)
+  config().packages.forEach(pkg => queuePackageForProcessing(pkg))
 
   // SET...
   Object.keys(packageWatchers).forEach(packageName =>

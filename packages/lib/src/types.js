@@ -1,6 +1,7 @@
 // @flow
 /* eslint-disable no-use-before-define */
 
+// eslint-disable-next-line no-unused-vars
 import type { ChildProcess } from 'child_process'
 import type { Chalk } from 'chalk'
 
@@ -17,6 +18,7 @@ export type CommandHooks = {
 }
 
 export type LernaColaCommandsConfig = {
+  clean?: CommandHooks,
   build?: CommandHooks,
   develop?: CommandHooks,
   deploy?: CommandHooks,
@@ -28,6 +30,7 @@ export type LernaColaPackageConfig = {
   entryFile: string,
   outputDir: string,
   packageJson: Object,
+  cleanPlugin?: LernaColaPluginConfig,
   buildPlugin?: LernaColaPluginConfig,
   developPlugin?: LernaColaPluginConfig,
   deployPlugin?: LernaColaPluginConfig,
@@ -80,9 +83,13 @@ export type DevelopPluginArgs = PluginArgs & {
   watcher: PackageWatcher,
 }
 
-export type BuildPlugin = {
+export type CleanPlugin = {
   name: string,
   clean: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
+}
+
+export type BuildPlugin = {
+  name: string,
   build: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
 }
 
@@ -103,6 +110,10 @@ export type DevelopPlugin = {
 }
 
 export type PackagePlugins = {
+  cleanPlugin?: {
+    plugin: CleanPlugin,
+    options: Object,
+  },
   buildPlugin?: {
     plugin: BuildPlugin,
     options: Object,
@@ -135,6 +146,7 @@ export type PackageMap = { [string]: Package }
 
 export type Config = {
   commands: {
+    clean: CommandHooks,
     build: CommandHooks,
     develop: CommandHooks,
     deploy: CommandHooks,

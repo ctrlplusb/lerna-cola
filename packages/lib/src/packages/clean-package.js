@@ -6,13 +6,13 @@ const TerminalUtils = require('../terminal')
 const config = require('../config')
 
 module.exports = async function cleanPackage(pkg: Package) {
-  const buildPlugin = pkg.plugins.buildPlugin
-  if (buildPlugin != null) {
+  const cleanPlugin = pkg.plugins.cleanPlugin
+  if (cleanPlugin != null) {
     TerminalUtils.verbosePkg(
       pkg,
-      `Running clean from build plugin: ${buildPlugin.plugin.name}`,
+      `Running clean plugin: ${cleanPlugin.plugin.name}`,
     )
-    await buildPlugin.plugin.clean(pkg, buildPlugin.options, {
+    await cleanPlugin.plugin.clean(pkg, cleanPlugin.options, {
       config: config(),
     })
     TerminalUtils.verbosePkg(pkg, `Ran clean`)

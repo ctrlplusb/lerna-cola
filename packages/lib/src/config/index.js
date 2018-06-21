@@ -24,6 +24,10 @@ let cache
 
 const defaultConfig = {
   commands: {
+    clean: {
+      pre: () => Promise.resolve(),
+      post: () => Promise.resolve(),
+    },
     build: {
       pre: () => Promise.resolve(),
       post: () => Promise.resolve(),
@@ -107,6 +111,12 @@ const config = () => {
         packageWebpackCache: path.resolve(packagePath, './.webpackcache'),
       },
       plugins: {
+        // $FlowFixMe
+        cleanPlugin: getPlugin(
+          packageJson.name,
+          packageConfig.cleanPlugin,
+          'cleanPlugin',
+        ),
         // $FlowFixMe
         buildPlugin: getPlugin(
           packageJson.name,
