@@ -1,8 +1,6 @@
-const { cleanAsync, buildAsync } = require('./utils')
+const { cleanAsync } = require('./utils')
 
-cleanAsync()
-  .then(buildAsync)
-  .then(() => process.exit(0))
+cleanAsync().then(() => process.exit(0))
 
 function preventScriptExit() {
   ;(function wait() {

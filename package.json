@@ -6,6 +6,7 @@
   "scripts": {
     "bootstrap": "yarn install && yarn build && yarn flow-types",
     "build": "node ./scripts/build.js",
+    "clean": "node ./scripts/clean.js",
     "flow-types": "rimraf projects/*/flow-typed && flow-mono create-symlinks flow/.flowconfig && flow-mono install-types",
     "publish": "yarn run build && lerna publish"
   },
