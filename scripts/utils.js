@@ -89,7 +89,7 @@ module.exports = {
   },
   cleanAsync: () => {
     console.log('Cleaning...')
-    Promise.all(flowPackages.map(cleanFlowPackage)).then(
+    return Promise.all(flowPackages.map(cleanFlowPackage)).then(
       () => {
         console.log('Clean complete')
       },
