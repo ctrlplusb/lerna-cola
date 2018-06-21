@@ -2,12 +2,16 @@
 
 const R = require('ramda')
 
-const execIfFunc = x => (typeof x === 'function' ? x() : x)
+function execIfFunc<T>(x: T | (() => T)): ?T {
+  return typeof x === 'function' ? x() : x
+}
 
-// :: (() => Any)|Any, () => Any)|Any) -> Any
-const onlyIf = R.curry(
-  (condition, value) => (execIfFunc(condition) ? execIfFunc(value) : undefined),
-)
+const onlyIf = R.curry(function onlyIfUncurried<T>(
+  condition: boolean | (() => boolean),
+  value: T | (() => T),
+): ?T {
+  return execIfFunc(condition) ? execIfFunc<T>(value) : undefined
+})
 
 module.exports = {
   onlyIf,

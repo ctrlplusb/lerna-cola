@@ -17,7 +17,7 @@ const multiLineStringToArray = (str: string): Array<string> =>
     removeEmpty,
   )(str)
 
-const prefixedMsg = (color: Chalk, prefix: string, msg: string) => {
+const prefixedMsg = (color: Chalk, prefix: string, msg: string): string => {
   const formattedPrefix = color(
     `${prefix.padEnd(config().terminalLabelMinLength + 1)}|`,
   )
@@ -27,13 +27,11 @@ const prefixedMsg = (color: Chalk, prefix: string, msg: string) => {
     .replace(/\n/gi, `\n${formattedPrefix} `)}`
 }
 
-const lernaColaMsg = (msg: string): string => {
-  return prefixedMsg(chalk.bgRed.black, 'lerna-cola', msg)
-}
+const lernaColaMsg = (msg: string): string =>
+  prefixedMsg(chalk.bgRed.black, 'lerna-cola', msg)
 
-const packageMsg = (pkg: Package, msg: string): string => {
-  return prefixedMsg(pkg.color, pkg.name, msg)
-}
+const packageMsg = (pkg: Package, msg: string): string =>
+  prefixedMsg(pkg.color, pkg.name, msg)
 
 module.exports = {
   lernaColaMsg,

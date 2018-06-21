@@ -34,28 +34,26 @@ const getDependants = (pkg: Package, packages: Array<Package>): Array<string> =>
   packages.filter(x => R.contains(pkg.name, allDeps(x))).map(R.prop('name'))
 
 const orderByDependencies = (packages: Array<Package>): Array<Package> => {
-  const packageDependencyGraph = pkg =>
+  const packageDependencyGraph = (pkg: Package): Array<Array<string>> =>
     R.pipe(
       allDeps,
       R.map(dependencyName => [dependencyName, pkg.name]),
     )(pkg)
 
-  // :: Array<Package> -> Array<Array<string, string>>
+  // $FlowFixMe
   const dependencyGraph = R.chain(packageDependencyGraph)
 
-  // :: Package -> bool
-  const hasNoDependencies = ({ dependencies }) => dependencies.length === 0
+  const hasNoDependencies = ({ dependencies }: Package): boolean =>
+    dependencies.length === 0
 
-  // :: Array<Package>
-  const packagesWithNoDependencies = R.pipe(
+  const packagesWithNoDependencies: Array<string> = R.pipe(
     R.filter(hasNoDependencies),
     R.map(R.prop('name')),
   )(packages)
 
-  // :: string -> Package
-  const findPackageByName = R.map(name =>
-    R.find(R.propEq('name', name), packages),
-  )
+  const findPackageByName: (Array<string>) => Array<Package> = R.map(name =>
+    packages.find(x => x.name === name),
+  ).filter(x => x != null)
 
   return R.pipe(
     dependencyGraph,
@@ -82,6 +80,7 @@ const getAllDependants = (
     ]
   }
 
+  // $FlowFixMe
   const allDependants = R.chain(resolveDependants, pkg.dependants)
 
   // Let's get a sorted version of allDependants by filtering allPackages
