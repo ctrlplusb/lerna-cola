@@ -17,7 +17,7 @@ export type CommandHooks = {
   post: () => Promise<void>,
 }
 
-export type LernaColaCommandsConfig = {
+export type LernaColaCommandHooksConfig = {
   clean?: CommandHooks,
   build?: CommandHooks,
   develop?: CommandHooks,
@@ -25,23 +25,20 @@ export type LernaColaCommandsConfig = {
 }
 
 export type LernaColaPackageConfig = {
-  name: string,
   srcDir: string,
   entryFile: string,
   outputDir: string,
-  disablePackageWatching: boolean,
-  packageJson: Object,
+  disableSrcWatching: boolean,
   cleanPlugin?: LernaColaPluginConfig,
   buildPlugin?: LernaColaPluginConfig,
   developPlugin?: LernaColaPluginConfig,
   deployPlugin?: LernaColaPluginConfig,
-  commands?: LernaColaCommandsConfig,
 }
 
 export type LernaColaConfig = {
-  packageSources?: Array<string>,
+  commandHooks?: LernaColaCommandHooksConfig,
   packages: { [key: string]: LernaColaPackageConfig },
-  terminalLabelMinLength: number,
+  packageSources?: Array<string>,
 }
 
 export type PackageVersions = { [string]: string }
@@ -91,31 +88,31 @@ export type DevelopPluginArgs = PluginArgs & {
   watcher: PackageWatcher,
 }
 
-export type CleanPlugin = {|
+export type CleanPlugin = {
   name: string,
   clean: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
-|}
+}
 
-export type BuildPlugin = {|
+export type BuildPlugin = {
   name: string,
   build: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
-|}
+}
 
 export type DeployPath = string
 
-export type DeployPlugin = {|
+export type DeployPlugin = {
   name: string,
   deploy: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
-|}
+}
 
-export type DevelopPlugin = {|
+export type DevelopPlugin = {
   name: string,
   develop: (
     pkg: Package,
     options: Object,
     args: DevelopPluginArgs,
   ) => Promise<DevelopInstance>,
-|}
+}
 
 export type PackagePlugins = {
   cleanPlugin?: {
@@ -140,7 +137,7 @@ export type Package = {
   name: string,
   config: Object,
   color: Chalk,
-  disablePackageWatching: boolean,
+  disableSrcWatching: boolean,
   allDependants: Array<string>,
   dependants: Array<string>,
   dependencies: Array<string>,
@@ -154,7 +151,7 @@ export type Package = {
 export type PackageMap = { [string]: Package }
 
 export type Config = {
-  commands: {
+  commandHooks: {
     clean: CommandHooks,
     build: CommandHooks,
     develop: CommandHooks,

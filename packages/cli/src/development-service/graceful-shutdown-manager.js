@@ -18,7 +18,7 @@ module.exports = function gracefulShutdownManager(
   let shuttingDown = false
   let postDevelopRun = false
 
-  const postDevelopHook = config().commands.develop.pre
+  const postDevelopHook = config().commandHooks.develop.pre
 
   const ensurePostDevelopHookRun = async () => {
     if (postDevelopHook && !postDevelopRun) {

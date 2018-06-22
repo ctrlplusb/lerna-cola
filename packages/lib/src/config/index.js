@@ -28,7 +28,7 @@ const {
 let cache
 
 const defaultConfig = {
-  commands: {
+  commandHooks: {
     clean: {
       pre: () => Promise.resolve(),
       post: () => Promise.resolve(),
@@ -54,7 +54,7 @@ const defaultPackageConfig = {
   srcDir: 'src',
   entryFile: 'index.js',
   outputDir: 'build',
-  disablePackageWatching: false,
+  disableSrcWatching: false,
   buildPlugin: undefined,
   developPlugin: undefined,
   deployPlugin: undefined,
@@ -114,6 +114,17 @@ const config = () => {
       ),
     }
 
+    // If we have a buildPlugin but no cleanPlugin then we will assign the
+    // default cleanPlugin that will ensure the build output directory
+    // gets cleaned between builds.
+    if (!plugins.cleanPlugin && plugins.buildPlugin) {
+      plugins.cleanPlugin = getPlugin(
+        packageJson.name,
+        'plugin-clean-build',
+        'cleanPlugin',
+      )
+    }
+
     // If we have a build plugin then we should be building our library
     // if it changes
     if (!plugins.developPlugin && plugins.buildPlugin) {
@@ -128,7 +139,7 @@ const config = () => {
       name: packageJson.name,
       color: ColorUtils.nextColorPair(),
       config: packageConfig,
-      disablePackageWatching: packageConfig.disablePackageWatching,
+      disableSrcWatching: packageConfig.disableSrcWatching,
       allDependants: [],
       dependants: [],
       dependencies: [],
@@ -150,6 +161,7 @@ const config = () => {
         packageRoot: packagePath,
         packageWebpackCache: path.resolve(packagePath, './.webpackcache'),
       },
+      // $FlowFixMe
       plugins,
       version: packageJson.version || '0.0.0',
     }
@@ -184,7 +196,7 @@ const config = () => {
 
   const result: Config = {
     // $FlowFixMe
-    commands: lernaColaConfig.commands,
+    commandHooks: lernaColaConfig.commandHooks,
     packages,
     packageMap: packages.reduce(
       (acc, pkg) => Object.assign(acc, { [pkg.name]: pkg }),

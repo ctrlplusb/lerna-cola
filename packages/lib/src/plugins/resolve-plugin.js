@@ -54,6 +54,8 @@ module.exports = (
 
   // Core plugins
   switch (pluginName) {
+    case 'plugin-clean-build':
+      return require('./clean-build')
     case 'plugin-develop-build':
       return require('./develop-build')
     case 'plugin-develop-server':

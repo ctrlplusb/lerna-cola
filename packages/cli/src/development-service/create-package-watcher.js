@@ -16,7 +16,7 @@ module.exports = function createPackageWatcher(
 ): PackageWatcher {
   TerminalUtils.verbosePkg(pkg, `Creating development source watcher...`)
 
-  if (pkg.disablePackageWatching) {
+  if (pkg.disableSrcWatching) {
     TerminalUtils.verbosePkg(
       pkg,
       `Did not create source watcher as it was disable via package config`,

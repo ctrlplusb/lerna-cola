@@ -1,5 +1,5 @@
 Bugs:
-  🎉
+  ☐ If no command/arg is provided to the lerna-cola cli an error occurs. Should print help.
 
 Docs:
   ☐ Intro
@@ -17,8 +17,8 @@ Plugins:
   ☐ parceljs
 
 Features:
-  ☐ When a change occurs in development server it should notify development conductor and plugins whether it came as a change on the package itself or from one of it's dependencies.
-  ☐ Read the lerna config for package sources if none specified in lerna-cola config
+  ☐ Pre/Post command hooks missing on: clean, build, and deploy commands.
+  ☐ Babel plugin to look for .babelrc in package and monorepo root
   ☐ Better help on lerna-cola bin
   ☐ Command hooks + error handling of them!
    ✔ predevelop @done (2018-3-2 15:15:11)
@@ -26,8 +26,7 @@ Features:
    ✔ pretest @done (2018-3-2 15:15:10)
    ✔ posttest @done (2018-3-2 15:15:10)
   ☐ Finish all inline TODO comments within code.
-  ☐ Plugin extension API
-  ☐ Validate the lerna-cola configuration (tcomb?)
+  ☐ Validate the lerna-cola configuration during runtime (tcomb?)
   ☐ Chokidar events should result in the absolute minimal amount of work being done. e.g. transpile a single file. remove a dir, etc
   ☐ auto-add source-map-support to build dependencies, and then re-enable for production builds.
   ☐ plugin interface for compilers - pre/post compile

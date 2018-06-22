@@ -24,7 +24,7 @@ module.exports = async function developmentService() {
   // Keep this message up here so it always comes before any others
   TerminalUtils.info('Press CTRL + C to exit')
 
-  const preDevelopHook = config().commands.develop.pre
+  const preDevelopHook = config().commandHooks.develop.pre
 
   TerminalUtils.info('Running the pre develop hook')
   await preDevelopHook()
