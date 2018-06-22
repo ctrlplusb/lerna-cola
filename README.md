@@ -111,12 +111,12 @@ module.exports = {
     // server develop plugin which will take care of executing and restarting
     // our microservices for any changes up their dependency trees.
 
-    'my-microservice-1': {
+    'microservice-one': {
       buildPlugin: '@lerna-cola/plugin-build-babel',
       developPlugin: 'plugin-develop-server',
     },
 
-    'my-microservice-1': {
+    'microservice-two': {
       buildPlugin: '@lerna-cola/plugin-build-babel',
       developPlugin: 'plugin-develop-server',
     },
@@ -573,6 +573,22 @@ module.exports = {
 }
 ```
 
+#### `@lerna-cola/plugin-build-typescript`
+
+> Coming soon
+
+#### `@lerna-cola/plugin-build-reasonml`
+
+> Coming soon
+
+#### `@lerna-cola/plugin-build-parcel`
+
+> Coming soon
+
+#### `@lerna-cola/plugin-build-rollup`
+
+> Coming soon
+
 ### 3rd Party Plugins
 
 Hopefully we will have some soon. 🤞
@@ -585,13 +601,53 @@ Developing plugins are very easy. You can develop 3 different types of plugins; 
 
 To create a plugin create a new package, where "main" on its package.json file points to the plugin source.
 
-Your plugin factory will receive two arguments:
+Your newly created package can adopt the behaviour of any of the plugin types as long as provides implementation for the interface specified for each plugin type. For example below is a template for a plugin package that supports all the plugin types (clean/build/develop/deploy):
+
+```javascript
+// my-plugin.js
+module.exports = {
+  name: 'my-plugin',
+  clean: (pkg, options, args) => Promise.resolve('todo'),
+  build: (pkg, options, args) => Promise.resolve('todo'),
+  develop: (pkg, options, args) => Promise.resolve('todo'),
+  deploy: (pkg, options, args) => Promise.resolve('todo'),
+}
+```
+
+Looking at the above, you can see that a plugin is really just a simple object, containing functionst that map to the command names. Each of the functions will receive a set of useful arguments, which will be described below, and need to return a `Promise` in order to indicate when they have completed.
+
+Lets review the arguments that are provided to each of the functions:
 
 - `pkg` (_Package_)
 
-  The package for which the plugin is assigned. This contains lots of really useful information about the package, such as it's dependency tree, src and build output paths etc. Please see the full schema for the [Package Schema](#package-schema) to see what is available to you.
+  The package for which the plugin command is getting executed against. This contains lots of really useful information about the package, such as it's dependency tree, src and build output paths etc. Please see the [Package Schema](#package-schema) for a full breakdown of what is available.
 
-> TODO complete...
+- `options` (_Object_)
+
+  Any options that were configured within the `lerna-cola.js` [configuration](#configuration) file will be provided here.
+
+  For example:
+
+  ```javascript
+  // lerna-cola.js
+  module.exports = {
+    packages: {
+      'my-lib': {
+        buildPlugin: {
+          name: '@lerna-cola/plugin-build-babel',
+          // 👇 this stuff here
+          options: {
+            config: 'my-babel-config-package',
+          },
+        },
+      },
+    },
+  }
+  ```
+
+- `args` (_Object_)
+
+  This will contain any other useful utils/data. Mostly plugin specific. Please read the docs for each plugin below.
 
 ### Clean Plugin
 
@@ -615,7 +671,75 @@ Below are schemas of the arguments that are provided to your plugins.
 
 #### `Package` Schema
 
-The holy grail of information for your plugins.
+The holy grail of information for your plugins. The object contains the following:
+
+- `name` (_string_)
+
+  The name of the package.
+
+- `config` (_Object_)
+
+  The configuration that is being used (taken from the `lerna-cola.js` file with defaults applied) for it.
+
+- `color` (`chalk` package function)
+
+  The `chalk` function representing the color we will use to uniquely identify console output for the package.
+
+- `dependants` (_Array&lt;string&gt;_)
+
+  The names of the other packages within the monorepo that have a direct dependency on this package.
+
+- `dependencies` (_Array&lt;string&gt;_)
+
+  The names of the other packages within the monorepo that this package has a direct dependency on.
+
+- `allDependants` (_Array&lt;string&gt;_)
+
+  The names of the ALL other packages within the monorepo that directly, or indirectly (via dependency tree), depend on this package.
+
+- `devDependencies` (_Array&lt;string&gt;_)
+
+  The names of the other packages within the monorepo that this package has a direct devDependency on.
+
+- `packageJson` (_Object_)
+
+  The package.json for this package.
+
+- `paths` (_Object_)
+
+  A set of paths for this package. Containing the following paths:
+
+  - `monoRepoRoot` (_string_)
+
+    The path to the root of the monorepo that this package belongs to.
+
+  - `monoRepoRootNodeModules` (_string_)
+
+    The path to the node_modules dir contained within the root of the monorepo that this package belongs to.
+
+  - `packageBuildOutput` (_string_)
+
+    The path to which build output should be emitted.
+
+  - `packageEntryFile` (_string_)
+
+    The source entry file for this package.
+
+  - `packageJson` (_string_)
+
+    The path to the package.json file for the package.
+
+  - `packageNodeModules` (_string_)
+
+    The path to the node_modules file for the package.
+
+  - `packageRoot` (_string_)
+
+    The path to the root dir of the package.
+
+  - `packageSrc` (_string_)
+
+    The path to the src dir of the package.
 
 #### `Config` Schema
 
