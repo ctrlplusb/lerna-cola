@@ -13,11 +13,11 @@ const preventScriptExit = require('../utils/prevent-script-exit')
 
 const onComplete = (err, output) => {
   if (err) {
-    TerminalUtils.error(err)
+    console.error(err)
     process.exit(1)
   }
   if (output) {
-    TerminalUtils.info(output)
+    console.log(output)
   }
   process.exit(0)
 }

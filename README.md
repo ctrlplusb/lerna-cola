@@ -15,7 +15,7 @@ Clean, build, develop, and deploy your packages utilising a rich plugin ecosyste
 - [Introduction](#introduction)
 - [Requirements](#requirements)
 - [(Not Really) Requirements](#not-really-requirements)
-- [Installation](#installation)
+- [Getting Started](#getting-started)
 - [Sample Application](#sample-application)
 - [Video Walkthrough](#video-walkthrough)
 - [Configuration](#configuration)
@@ -67,9 +67,9 @@ Lift your build, development and deployment to the root of your monorepo, keep y
 
   To tell you the truth, we don't strictly require that you use Lerna. You could very well use straight up Yarn workspaces or any other monorepo enabling tool, but in our opinion you would be missing out on some very cool features that Lerna provides.
 
-## Installation
+## Getting started
 
-Simply add the Lerna Cola CLI package as a dev dependency to the root of your monorepo:
+**First, you need to install the cli**
 
 ```bash
 yarn add @lerna-cola/cli -DW
@@ -79,6 +79,24 @@ _or, via NPM_:
 
 ```bash
 npm i @lerna-cola/cli -D
+```
+
+**Secondly, you'll need a `lerna-cola.js` [configuration](#configuration) file**
+
+You'll need to reference the [Configuration](#configuration) on how to do this.
+
+**Lastly, fire up the lern-cola CLI**
+
+You can run the help to see the help commands
+
+```bash
+yarn lerna-cola help
+```
+
+_or, via NPX_
+
+```
+npx lerna-cola help
 ```
 
 ## Sample Application
