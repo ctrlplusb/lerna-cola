@@ -26,7 +26,7 @@ module.exports = async function deploymentService() {
     },
   )
 
-  if (namesOfPackagesToDeploy.length === 0) {
+  if (namesOfPackagesToDeploy.value.length === 0) {
     TerminalUtils.info('No packages selected. Exiting...')
     process.exit(0)
   }

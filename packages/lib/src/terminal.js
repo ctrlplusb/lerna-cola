@@ -6,8 +6,13 @@ import type { Package } from './types'
 
 const StringUtils = require('./strings')
 
+type MultiSelectChoice = {
+  value: string,
+  text: string,
+}
+
 type MultiSelectOptions = {
-  choices: Array<string>,
+  choices: Array<MultiSelectChoice>,
   selected?: Array<string>,
   validate?: (Array<string>) => boolean | string,
 }

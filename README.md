@@ -95,7 +95,7 @@ Before we describe the configuration schema, we'll introduce an example:
           "presets": ["babel-preset-env"]
         }
       },
-      "developPlugin": "core-plugin-develop-server"
+      "developPlugin": "plugin-develop-server"
     },
     "my-microservice-1": {
       "buildPlugin": {
@@ -104,20 +104,20 @@ Before we describe the configuration schema, we'll introduce an example:
           "presets": ["babel-preset-env"]
         }
       },
-      "developPlugin": "core-plugin-develop-server"
+      "developPlugin": "plugin-develop-server"
     },
     // The following package is a "Create React App" package which comes with
     // it's own build and develop (start) scripts. We will therefore use the
     // Lerna Cola script plugin to delegate to the CRA scripts.
     "my-ui": {
       "buildPlugin": {
-        "name": "core-plugin-script",
+        "name": "plugin-script",
         "options": {
           "scriptName": "build"
         }
       },
       "developPlugin": {
-        "name": "core-plugin-script",
+        "name": "plugin-script",
         "options": {
           "scriptName": "start"
         }
@@ -233,11 +233,11 @@ Plugins are split by "core" plugins, which are bundled with the `@lerna-cola/cor
 
 ### Core Plugins
 
-#### `core-plugin-develop-server`
+#### `plugin-develop-server`
 
 > TODO
 
-#### `core-plugin-script`
+#### `plugin-script`
 
 > TODO
 

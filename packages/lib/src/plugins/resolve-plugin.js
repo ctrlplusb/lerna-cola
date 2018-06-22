@@ -54,11 +54,11 @@ module.exports = (
 
   // Core plugins
   switch (pluginName) {
-    case 'core-plugin-develop-build':
+    case 'plugin-develop-build':
       return require('./develop-build')
-    case 'core-plugin-develop-server':
+    case 'plugin-develop-server':
       return require('./develop-server')
-    case 'core-plugin-script':
+    case 'plugin-script':
       return require('./script')
     default:
     // Do nothing, fall through and resolve custom plugin...

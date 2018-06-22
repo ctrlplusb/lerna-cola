@@ -3,16 +3,22 @@
 /* eslint-disable no-use-before-define */
 
 import type {
+  ChangeType,
   Package,
   PackageConductor,
   PackageWatcher,
 } from '@lerna-cola/lib/build/types'
 
-const R = require('ramda')
 const { config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 const createPackageConductor = require('./create-package-conductor')
 const createPackageWatcher = require('./create-package-watcher')
 const gracefulShutdownManager = require('./graceful-shutdown-manager')
+
+type QueueItem = {
+  package: Package,
+  changeType: ChangeType,
+  changedDependency?: Package,
+}
 
 module.exports = async function developmentService() {
   // Keep this message up here so it always comes before any others
@@ -30,18 +36,20 @@ module.exports = async function developmentService() {
   let currentlyProcessing = null
 
   // Represents the build backlog queue. FIFO.
-  let toProcessQueue: Array<Package> = []
+  // We will queue all the packages for the first run
+  let toProcessQueue: Array<QueueItem> = config().packages.map(pkg => ({
+    package: pkg,
+    changeType: 'FIRST_RUN',
+  }))
 
-  const packageHasDependant: Package => Package => boolean = R.curry(
-    (dependant: Package, pkg: Package): boolean =>
-      R.contains(dependant.name, pkg.dependants),
-  )
+  const packageHasDependant = (dependant: Package, pkg: Package): boolean =>
+    pkg.dependants.includes(dependant.name)
 
   const getPackageDependants = (pkg: Package): Array<Package> =>
     pkg.dependants.map(name => config().packageMap[name])
 
   const onChange = (pkg: Package) => (): void => {
-    queuePackageForProcessing(pkg)
+    queuePackageForProcessing(pkg, 'SELF_CHANGED')
     // If no active build running then we will call off to run next item in
     // the queue.
     if (!currentlyProcessing) {
@@ -49,6 +57,11 @@ module.exports = async function developmentService() {
     }
   }
 
+  /**
+   * Package watches are responsible for watching the source of the packages
+   * and then notifying of changes so that packages can be queued to be
+   * processed.
+   */
   const packageWatchers: {
     [key: string]: PackageWatcher,
   } = config().packages.reduce(
@@ -59,6 +72,12 @@ module.exports = async function developmentService() {
     {},
   )
 
+  /**
+   * Package develop conductors are responsible for calling the respective
+   * develop plugins for packages when changes occur. They manage any
+   * child processes that are spawned, ensuring there is only a single
+   * child process per package.
+   */
   const packageDevelopConductors: {
     [key: string]: PackageConductor,
   } = config().packages.reduce(
@@ -69,14 +88,27 @@ module.exports = async function developmentService() {
     {},
   )
 
+  /**
+   * Queues an item of processing. This will be sensitive to items already
+   * in the queue.
+   *
+   * @param {*} packageToQueue
+   *   The package to queue
+   * @param {*} changeType
+   *   The change that cause the queueing of the item.
+   * @param {*} changedDependency
+   *   If it was caused by a dependency changing then this is the dependency
+   *   that changed.
+   */
   const queuePackageForProcessing = (
     packageToQueue: Package,
-    originatingPackage?: Package,
+    changeType: ChangeType,
+    changedDependency?: Package,
   ): void => {
     TerminalUtils.verbose(`Attempting to queue ${packageToQueue.name}`)
     if (
       currentlyProcessing !== null &&
-      packageHasDependant(packageToQueue)(currentlyProcessing)
+      packageHasDependant(packageToQueue, currentlyProcessing)
     ) {
       // Do nothing as the package currently being built will result in this
       // package being built via it's dependancy chain.
@@ -84,7 +116,11 @@ module.exports = async function developmentService() {
         packageToQueue,
         `Skipping development service queue as represented by a queued package`,
       )
-    } else if (R.any(packageHasDependant(packageToQueue), toProcessQueue)) {
+    } else if (
+      toProcessQueue.some(queueItem =>
+        packageHasDependant(packageToQueue, queueItem.package),
+      )
+    ) {
       // Do nothing as one of the queued packagesToDevelop will result in this package
       // getting built via it's dependancy chain.
       TerminalUtils.verbosePkg(
@@ -98,35 +134,43 @@ module.exports = async function developmentService() {
       // We'll assign the package to the build queue, removing any of the
       // package's dependants as they will be represented by the package being
       // added.
-      toProcessQueue = R.without(packageDependants, toProcessQueue).concat([
-        packageToQueue,
-      ])
+      toProcessQueue = toProcessQueue
+        .filter(
+          queueItem =>
+            !packageDependants.find(pkg => pkg.name === queueItem.package.name),
+        )
+        .concat([{ package: packageToQueue, changeType, changedDependency }])
       TerminalUtils.verbose(
-        `Queue: [${toProcessQueue.map(x => x.name).join(',')}]`,
+        `Queue: [${toProcessQueue.map(x => x.package.name).join(',')}]`,
       )
     }
   }
 
-  const processPackage = (pkg: Package): void => {
-    currentlyProcessing = pkg
-    const packageDevelopConductor = packageDevelopConductors[pkg.name]
+  /**
+   * Processes a package in the queue, and if successfully processed it will
+   * queue the packages dependencies.
+   */
+  const processQueueItem = (queueItem: QueueItem): void => {
+    currentlyProcessing = queueItem.package
+    const packageDevelopConductor =
+      packageDevelopConductors[queueItem.package.name]
     if (!packageDevelopConductor) {
       TerminalUtils.error(
         `Did not run develop process for ${
-          pkg.name
+          queueItem.package.name
         } as there is no package develop conductor registered for it`,
       )
       return
     }
     packageDevelopConductor
       // Kick off the develop of the package
-      .start()
+      .run(queueItem.changeType, queueItem.changedDependency)
       // Develop kickstart succeeded 🎉
       .then(() => ({ success: true }))
       // Or, failed 😭
       .catch(err => {
         TerminalUtils.errorPkg(
-          pkg,
+          queueItem.package,
           `An error occurred whilst trying to start development instance.`,
           err,
         )
@@ -140,11 +184,24 @@ module.exports = async function developmentService() {
         // If the build succeeded we will queue dependants
         if (success) {
           TerminalUtils.verbosePkg(
-            pkg,
+            queueItem.package,
             `Develop process ran successfully, queueing dependants...`,
           )
-          const packageDependants = getPackageDependants(pkg)
-          packageDependants.forEach(dep => queuePackageForProcessing(dep, pkg))
+          const packageDependants = getPackageDependants(
+            queueItem.package,
+          ).filter(
+            dependant =>
+              !toProcessQueue.some(
+                queued => queued.package.name === dependant.name,
+              ),
+          )
+          packageDependants.forEach(dep =>
+            queuePackageForProcessing(
+              dep,
+              'DEPENDENCY_CHANGED',
+              queueItem.package,
+            ),
+          )
         }
 
         // We will call off the next item to be processe even if a failure
@@ -169,17 +226,14 @@ module.exports = async function developmentService() {
       // Pop the queue.
       const nextToProcess = toProcessQueue[0]
       toProcessQueue = toProcessQueue.slice(1)
-      TerminalUtils.verbose(`Popped ${nextToProcess.name}`)
-      processPackage(nextToProcess)
+      TerminalUtils.verbose(`Popped ${nextToProcess.package.name}`)
+      processQueueItem(nextToProcess)
     } else {
       TerminalUtils.verbose('Nothing to pop')
     }
   }
 
-  // READY...
-  config().packages.forEach(pkg => queuePackageForProcessing(pkg))
-
-  // SET...
+  // READY, SET...
   Object.keys(packageWatchers).forEach(packageName =>
     packageWatchers[packageName].start(),
   )
@@ -187,7 +241,7 @@ module.exports = async function developmentService() {
   // GO! 🚀
   processNextInTheQueue()
 
-  // Ensure graceful shutting down:
+  // Ensure graceful shutting down
   gracefulShutdownManager(packageDevelopConductors, packageWatchers)
 
   return new Promise(() => {

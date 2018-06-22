@@ -5,7 +5,12 @@
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 
-import type { Config, LernaColaConfig, Package } from '../types'
+import type {
+  Config,
+  LernaColaConfig,
+  LernaColaPackageConfig,
+  Package,
+} from '../types'
 
 const path = require('path')
 const fs = require('fs-extra')
@@ -49,6 +54,7 @@ const defaultPackageConfig = {
   srcDir: 'src',
   entryFile: 'index.js',
   outputDir: 'build',
+  disablePackageWatching: false,
   buildPlugin: undefined,
   developPlugin: undefined,
   deployPlugin: undefined,
@@ -81,14 +87,48 @@ const config = () => {
   let packages: Array<Package> = getPackageRoots().map(packagePath => {
     // $FlowFixMe
     const packageJson = require(path.join(packagePath, './package.json'))
-    const packageConfig = ObjectUtils.mergeDeep(
+    const packageConfig: LernaColaPackageConfig = ObjectUtils.mergeDeep(
       defaultPackageConfig,
       lernaColaConfig.packages[packageJson.name] || {},
     )
+    const plugins = {
+      cleanPlugin: getPlugin(
+        packageJson.name,
+        packageConfig.cleanPlugin,
+        'cleanPlugin',
+      ),
+      buildPlugin: getPlugin(
+        packageJson.name,
+        packageConfig.buildPlugin,
+        'buildPlugin',
+      ),
+      developPlugin: getPlugin(
+        packageJson.name,
+        packageConfig.developPlugin,
+        'developPlugin',
+      ),
+      deployPlugin: getPlugin(
+        packageJson.name,
+        packageConfig.deployPlugin,
+        'deployPlugin',
+      ),
+    }
+
+    // If we have a build plugin then we should be building our library
+    // if it changes
+    if (!plugins.developPlugin && plugins.buildPlugin) {
+      plugins.developPlugin = getPlugin(
+        packageJson.name,
+        'plugin-develop-build',
+        'developPlugin',
+      )
+    }
+
     return {
       name: packageJson.name,
       color: ColorUtils.nextColorPair(),
       config: packageConfig,
+      disablePackageWatching: packageConfig.disablePackageWatching,
       allDependants: [],
       dependants: [],
       dependencies: [],
@@ -110,32 +150,7 @@ const config = () => {
         packageRoot: packagePath,
         packageWebpackCache: path.resolve(packagePath, './.webpackcache'),
       },
-      plugins: {
-        // $FlowFixMe
-        cleanPlugin: getPlugin(
-          packageJson.name,
-          packageConfig.cleanPlugin,
-          'cleanPlugin',
-        ),
-        // $FlowFixMe
-        buildPlugin: getPlugin(
-          packageJson.name,
-          packageConfig.buildPlugin,
-          'buildPlugin',
-        ),
-        // $FlowFixMe
-        developPlugin: getPlugin(
-          packageJson.name,
-          packageConfig.developPlugin,
-          'developPlugin',
-        ),
-        // $FlowFixMe
-        deployPlugin: getPlugin(
-          packageJson.name,
-          packageConfig.deployPlugin,
-          'deployPlugin',
-        ),
-      },
+      plugins,
       version: packageJson.version || '0.0.0',
     }
   })

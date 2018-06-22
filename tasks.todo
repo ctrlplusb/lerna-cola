@@ -11,18 +11,13 @@ Docs:
   ☐ Usage of process.stdin.read() to stop process exiting (even though it has child processes)
 
 Plugins:
-  ☐ razzle
-  ☐ backpack
   ☐ reasonml
   ☐ typescript
   ☐ rollup
   ☐ parceljs
 
 Features:
-  ☐ Standard log messages should be prefixed as "lerna cola     |"
   ☐ When a change occurs in development server it should notify development conductor and plugins whether it came as a change on the package itself or from one of it's dependencies.
-  ☐ Change server develop plugin to use entry file, or use "main" via useMain flag.
-  ☐ Allow the ability to specify packages to be ignored by the development process (e.g. watching test libraries not useful and waste of resources).
   ☐ Read the lerna config for package sources if none specified in lerna-cola config
   ☐ Better help on lerna-cola bin
   ☐ Command hooks + error handling of them!

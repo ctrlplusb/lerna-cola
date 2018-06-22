@@ -35,7 +35,7 @@
     "write-pkg": "3.2.0"
   },
   "devDependencies": {
-    "flow-bin": "0.74.0",
+    "flow-bin": "0.75.0",
     "flow-typed": "2.4.0"
   }
 }

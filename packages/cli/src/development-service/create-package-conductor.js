@@ -19,8 +19,7 @@ module.exports = function createPackageConductor(
   let runningDevelopInstance
 
   return {
-    // :: void -> Promise
-    start: () => {
+    run: (changeType, changedDependency) => {
       const developPlugin = pkg.plugins.developPlugin
       if (!developPlugin) {
         TerminalUtils.verbosePkg(
@@ -30,17 +29,23 @@ module.exports = function createPackageConductor(
         return Promise.resolve(noPluginResult)
       }
 
-      TerminalUtils.verbosePkg(pkg, `Starting develop plugin`)
+      TerminalUtils.verbosePkg(
+        pkg,
+        `Running develop plugin for change type: ${changeType}`,
+      )
 
       return developPlugin.plugin
-        .develop(pkg, developPlugin.options, { config: config(), watcher })
+        .develop(pkg, developPlugin.options, {
+          config: config(),
+          watcher,
+          changeType,
+          changedDependency,
+        })
         .then(developInstance => {
           runningDevelopInstance = developInstance
           return developInstance
         })
     },
-
-    // :: void -> Promise
     stop: () =>
       runningDevelopInstance
         ? runningDevelopInstance.kill()

@@ -29,6 +29,7 @@ export type LernaColaPackageConfig = {
   srcDir: string,
   entryFile: string,
   outputDir: string,
+  disablePackageWatching: boolean,
   packageJson: Object,
   cleanPlugin?: LernaColaPluginConfig,
   buildPlugin?: LernaColaPluginConfig,
@@ -50,8 +51,13 @@ export type PackageWatcher = {
   stop: () => void,
 }
 
+export type ChangeType = 'FIRST_RUN' | 'SELF_CHANGED' | 'DEPENDENCY_CHANGED'
+
 export type PackageConductor = {
-  start: () => Promise<DevelopInstance>,
+  run: (
+    type: ChangeType,
+    changedDependency?: Package,
+  ) => Promise<DevelopInstance>,
   stop: () => Promise<void>,
 }
 
@@ -80,34 +86,36 @@ export type PluginArgs = {
 }
 
 export type DevelopPluginArgs = PluginArgs & {
+  changeType: ChangeType,
+  changedDependency?: Package,
   watcher: PackageWatcher,
 }
 
-export type CleanPlugin = {
+export type CleanPlugin = {|
   name: string,
   clean: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
-}
+|}
 
-export type BuildPlugin = {
+export type BuildPlugin = {|
   name: string,
   build: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
-}
+|}
 
 export type DeployPath = string
 
-export type DeployPlugin = {
+export type DeployPlugin = {|
   name: string,
   deploy: (pkg: Package, options: Object, args: PluginArgs) => Promise<void>,
-}
+|}
 
-export type DevelopPlugin = {
+export type DevelopPlugin = {|
   name: string,
   develop: (
     pkg: Package,
     options: Object,
     args: DevelopPluginArgs,
   ) => Promise<DevelopInstance>,
-}
+|}
 
 export type PackagePlugins = {
   cleanPlugin?: {
@@ -132,6 +140,7 @@ export type Package = {
   name: string,
   config: Object,
   color: Chalk,
+  disablePackageWatching: boolean,
   allDependants: Array<string>,
   dependants: Array<string>,
   dependencies: Array<string>,
