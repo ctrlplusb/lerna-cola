@@ -22,6 +22,7 @@ Clean, build, develop, and deploy your packages utilising a rich plugin ecosyste
   - [Example Configuration](#example-configuration)
   - [Configuration Schema](#configuration-schema)
 - [CLI Commands](#cli-commands)
+  - [clean](#clean)
   - [build](#build)
   - [develop](#develop)
   - [deploy](#deploy)
