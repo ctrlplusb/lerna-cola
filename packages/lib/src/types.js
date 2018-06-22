@@ -48,13 +48,10 @@ export type PackageWatcher = {
   stop: () => void,
 }
 
-export type ChangeType = 'FIRST_RUN' | 'SELF_CHANGED' | 'DEPENDENCY_CHANGED'
+export type RunType = 'FIRST_RUN' | 'SELF_CHANGED' | 'DEPENDENCY_CHANGED'
 
 export type PackageConductor = {
-  run: (
-    type: ChangeType,
-    changedDependency?: Package,
-  ) => Promise<DevelopInstance>,
+  run: (type: RunType, changedDependency?: Package) => Promise<DevelopInstance>,
   stop: () => Promise<void>,
 }
 
@@ -83,7 +80,7 @@ export type PluginArgs = {
 }
 
 export type DevelopPluginArgs = PluginArgs & {
-  changeType: ChangeType,
+  runType: RunType,
   changedDependency?: Package,
   watcher: PackageWatcher,
 }

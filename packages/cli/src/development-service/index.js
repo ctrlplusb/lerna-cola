@@ -3,7 +3,7 @@
 /* eslint-disable no-use-before-define */
 
 import type {
-  ChangeType,
+  RunType,
   Package,
   PackageConductor,
   PackageWatcher,
@@ -16,7 +16,7 @@ const gracefulShutdownManager = require('./graceful-shutdown-manager')
 
 type QueueItem = {
   package: Package,
-  changeType: ChangeType,
+  runType: RunType,
   changedDependency?: Package,
 }
 
@@ -39,7 +39,7 @@ module.exports = async function developmentService() {
   // We will queue all the packages for the first run
   let toProcessQueue: Array<QueueItem> = config().packages.map(pkg => ({
     package: pkg,
-    changeType: 'FIRST_RUN',
+    runType: 'FIRST_RUN',
   }))
 
   const packageHasDependant = (dependant: Package, pkg: Package): boolean =>
@@ -94,7 +94,7 @@ module.exports = async function developmentService() {
    *
    * @param {*} packageToQueue
    *   The package to queue
-   * @param {*} changeType
+   * @param {*} runType
    *   The change that cause the queueing of the item.
    * @param {*} changedDependency
    *   If it was caused by a dependency changing then this is the dependency
@@ -102,7 +102,7 @@ module.exports = async function developmentService() {
    */
   const queuePackageForProcessing = (
     packageToQueue: Package,
-    changeType: ChangeType,
+    runType: RunType,
     changedDependency?: Package,
   ): void => {
     TerminalUtils.verbose(`Attempting to queue ${packageToQueue.name}`)
@@ -139,7 +139,7 @@ module.exports = async function developmentService() {
           queueItem =>
             !packageDependants.find(pkg => pkg.name === queueItem.package.name),
         )
-        .concat([{ package: packageToQueue, changeType, changedDependency }])
+        .concat([{ package: packageToQueue, runType, changedDependency }])
       TerminalUtils.verbose(
         `Queue: [${toProcessQueue.map(x => x.package.name).join(',')}]`,
       )
@@ -164,7 +164,7 @@ module.exports = async function developmentService() {
     }
     packageDevelopConductor
       // Kick off the develop of the package
-      .run(queueItem.changeType, queueItem.changedDependency)
+      .run(queueItem.runType, queueItem.changedDependency)
       // Develop kickstart succeeded 🎉
       .then(() => ({ success: true }))
       // Or, failed 😭

@@ -19,7 +19,7 @@ module.exports = function createPackageConductor(
   let runningDevelopInstance
 
   return {
-    run: (changeType, changedDependency) => {
+    run: (runType, changedDependency) => {
       const developPlugin = pkg.plugins.developPlugin
       if (!developPlugin) {
         TerminalUtils.verbosePkg(
@@ -31,14 +31,14 @@ module.exports = function createPackageConductor(
 
       TerminalUtils.verbosePkg(
         pkg,
-        `Running develop plugin for change type: ${changeType}`,
+        `Running develop plugin for change type: ${runType}`,
       )
 
       return developPlugin.plugin
         .develop(pkg, developPlugin.options, {
           config: config(),
           watcher,
-          changeType,
+          runType,
           changedDependency,
         })
         .then(developInstance => {

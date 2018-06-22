@@ -615,11 +615,11 @@ Please submit a PR to add yours here.
 
 ## Plugin Development
 
-Developing plugins are very easy. You can develop 3 different types of plugins; one for each command type.
+Developing plugins is very easy. You can create a plugin to support one or more of the 4 commands that Lerna Cola provides.
 
-To create a plugin create a new package, where "main" on its package.json file points to the plugin source.
+To create a plugin simply create new package where the "main" on its package.json file points to the plugin module.
 
-Your newly created package can adopt the behaviour of any of the plugin types as long as provides implementation for the interface specified for each plugin type. For example below is a template for a plugin package that supports all the plugin types (clean/build/develop/deploy):
+Your newly created package can adopt the behaviour of any of the plugin types as long as provides implementation for the interface specified for each plugin type. For example below is a template for a plugin package that supports all the command types (clean/build/develop/deploy):
 
 ```javascript
 // my-plugin.js
@@ -632,9 +632,11 @@ module.exports = {
 }
 ```
 
-Looking at the above, you can see that a plugin is really just a simple object, containing functionst that map to the command names. Each of the functions will receive a set of useful arguments, which will be described below, and need to return a `Promise` in order to indicate when they have completed.
+Looking at the above, you can see that a plugin is really just a simple object, containing functions that map to the command names. Each of the functions will receive a set of useful arguments, which will be described below, and need to return a `Promise` in order to indicate when they have completed.
 
-Lets review the arguments that are provided to each of the functions:
+When running a command, the associated plugins will get executed for each package that they are configured against. The plugin functions will receive as an argument an object describing the package that it is running against, as well as the specific options that were defined when assigning the plugin to the package within the Lerna Cola [configuration](#configuration) file.
+
+Lets review the arguments that are provided to each of the plugin functions:
 
 - `pkg` (_Package_)
 
@@ -669,19 +671,77 @@ Lets review the arguments that are provided to each of the functions:
 
 ### Clean Plugin
 
-> TODO
+Requires the following interface be satisfied:
+
+```javascript
+module.exports = {
+  name: 'my-plugin',
+  clean: (pkg, options, args) => Promise.resolve('todo'),
+}
+```
 
 ### Build Plugin
 
-> TODO
+Requires the following interface be satisfied:
+
+```javascript
+module.exports = {
+  name: 'my-plugin',
+  build: (pkg, options, args) => Promise.resolve('todo'),
+}
+```
 
 ### Develop Plugin
 
-> TODO
+Requires the following interface be satisfied:
+
+```javascript
+module.exports = {
+  name: 'my-plugin',
+  develop: (pkg, options, args) => Promise.resolve('todo'),
+}
+```
+
+A special note on the develop plugin; it gets executed via the development service and will be run multiple times. Specifically the plugin will be run under the following conditions:
+
+- When the development service first starts
+- Any time a change is detected within the src directory of the package it is configured against
+- Any time one of the packages within the monorepo that it depends on changes.
+
+This allows you to know when to do restarting etc, and what type of behaviour you would like to implement for each scenario.
+
+The `args` parameter is also well used by the develop plugin. It will contain the following items:
+
+- `runType` (_string_)
+
+  It will contain one of the following values:
+
+  - 'FIRST_RUN'
+
+    Indicates that this is the first time the develop plugin is being executed during by the development service.
+
+  - 'SELF_CHANGED'
+
+    Indicates that a file within the src directory of the package it is configured against changed.
+
+  - 'DEPENDENCY_CHANGED'
+
+    Indicates that a package that it depends upon within the monorepo changed.
+
+- `changedDependency`
+
+  This will contain the [Package](#package-scheam) meta object describing the dependency that changed when the `runType` is "DEPENDENCY_CHANGED".
 
 ### Deploy Plugin
 
-> TODO
+Requires the following interface be satisfied:
+
+```javascript
+module.exports = {
+  name: 'my-plugin',
+  develop: (pkg, options, args) => Promise.resolve('todo'),
+}
+```
 
 ### Schemas
 
