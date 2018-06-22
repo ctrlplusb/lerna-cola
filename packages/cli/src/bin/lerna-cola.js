@@ -22,6 +22,8 @@ const onComplete = (err, output) => {
   process.exit(0)
 }
 
+const args = process.argv.slice(2)
+
 yargs
   .command(buildCommand)
   .command(cleanCommand)
@@ -30,7 +32,9 @@ yargs
   .demandCommand()
   .help('h')
   .alias('h', 'help')
-  .parse(process.argv.slice(2), (err, argv, output) => {
+
+if (args.length > 0) {
+  yargs.parse(process.argv.slice(2), (err, argv, output) => {
     TerminalUtils.verbose(argv)
     if (argv.promisedResult) {
       TerminalUtils.verbose('Waiting for async command to complete...')
@@ -42,5 +46,8 @@ yargs
       onComplete(err, output)
     }
   })
+} else {
+  yargs.parse()
+}
 
 preventScriptExit()
