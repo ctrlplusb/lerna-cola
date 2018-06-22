@@ -11,20 +11,31 @@ const tempWrite = require('temp-write')
 const writeJsonFile = require('write-json-file')
 const { TerminalUtils, ChildProcessUtils } = require('@lerna-cola/lib')
 
-type NowConfig = {
+type NowSettings = {
   forwardNpm?: boolean,
   public?: boolean,
 }
 
-type NowAliasRules = {}
+type NowAliasPathRule =
+  | {|
+      dest: string,
+    |}
+  | {|
+      pathname: string,
+      method: Array<string>,
+      dest: string,
+    |}
+
+type NowPathAlias = {
+  rules: Array<NowAliasPathRule>,
+}
 
 type Options = {
-  additionalAliasRules?: Array<NowAliasRules>,
-  alias?: string,
   disableRemovePrevious?: boolean,
   deployTimeoutMins?: number,
   passThroughEnvVars?: Array<string>,
-  nowConfig?: NowConfig,
+  pathAlias?: NowPathAlias,
+  settings?: NowSettings,
 }
 
 const nowDeployPlugin: DeployPlugin = {
@@ -42,16 +53,6 @@ const nowDeployPlugin: DeployPlugin = {
     process.exit(1)
   },
   deploy: async (pkg: Package, options: Options) => {
-    const { alias } = options
-    if (alias == null || R.isEmpty(alias)) {
-      TerminalUtils.errorPkg(
-        pkg,
-        'You must supply an "alias" for the "now" deploy plugin.',
-      )
-      process.exit(1)
-      throw new Error('💩')
-    }
-
     if (process.env.NOW_USERNAME == null) {
       TerminalUtils.errorPkg(
         pkg,
@@ -92,8 +93,8 @@ const nowDeployPlugin: DeployPlugin = {
         )
       : []
 
-    const nowConfigPath = tempWrite.sync()
-    const nowConfig = deepMerge(
+    const nowSettingsPath = tempWrite.sync()
+    const nowSettings = deepMerge(
       deepMerge(
         // Defaults
         {
@@ -101,7 +102,7 @@ const nowDeployPlugin: DeployPlugin = {
           public: false,
         },
         // User overrides
-        options.nowConfig || {},
+        options.settings || {},
       ),
       // These must be provided via the env for forced safety:
       {
@@ -111,7 +112,7 @@ const nowDeployPlugin: DeployPlugin = {
         },
       },
     )
-    writeJsonFile.sync(nowConfigPath, nowConfig)
+    writeJsonFile.sync(nowSettingsPath, nowSettings)
 
     const args = [
       'deploy',
@@ -119,7 +120,7 @@ const nowDeployPlugin: DeployPlugin = {
       deploymentName,
       ...envVars,
       '-c',
-      nowConfigPath,
+      nowSettingsPath,
       '-C',
       '-t',
       process.env.NOW_TOKEN || '',
@@ -170,72 +171,68 @@ const nowDeployPlugin: DeployPlugin = {
       },
     )
 
-    TerminalUtils.infoPkg(
-      pkg,
-      `Setting up alias for new deployment to ${alias}....`,
-    )
-    await ChildProcessUtils.execPkg(pkg, 'now', [
-      'alias',
-      'set',
-      deploymentId,
-      alias,
-    ])
+    const alias = R.path(['settings', 'alias'], options)
 
-    // We need to do this at this point before attaching the rules as the rules
-    // seem to indicate the deployment as not being aliased :-/
-    if (!options.disableRemovePrevious) {
-      // Removes previous deployments 👍
-      try {
-        TerminalUtils.infoPkg(pkg, `Removing unaliased deployments...`)
-        await ChildProcessUtils.execPkg(pkg, 'now', [
-          'rm',
-          deploymentName,
-          '--safe',
-          '-y',
-        ])
-      } catch (err) {
-        TerminalUtils.errorPkg(
-          pkg,
-          'Failed to remove previous deployments. There may not have been any previous deployments.',
-        )
-        TerminalUtils.verbosePkg(pkg, err.stack)
-      }
-    }
-
-    if (options.additionalAliasRules) {
-      TerminalUtils.infoPkg(pkg, 'Attaching additional alias rules...')
-      const aliasRulesPath = tempWrite.sync()
-      writeJsonFile.sync(aliasRulesPath, {
-        rules: [
-          ...(options.additionalAliasRules || []),
-          {
-            dest: deploymentId,
-          },
-        ],
-      })
-      await ChildProcessUtils.execPkg(pkg, 'now', [
-        'alias',
-        alias,
-        '-r',
-        aliasRulesPath,
-      ])
-    }
-
-    const minScale = R.path(['scale', 'min'], options)
-    if (minScale) {
-      const maxScale = R.path(['scale', 'max'], options)
+    if (alias != null) {
       TerminalUtils.infoPkg(
         pkg,
-        `Setting the scale factor to min(${minScale}) ${
-          maxScale ? `max(${maxScale})` : ''
-        }....`,
+        `Setting up alias for new deployment to ${alias}....`,
       )
-      await ChildProcessUtils.execPkg(
-        pkg,
-        'now',
-        // $FlowFixMe
-        ['scale', deploymentId, minScale, maxScale].filter(x => x != null),
-      )
+      await ChildProcessUtils.execPkg(pkg, 'now', [
+        'alias',
+        'set',
+        deploymentId,
+        alias,
+      ])
+
+      // We need to do this at this point before attaching the rules as the rules
+      // seem to indicate the deployment as not being aliased :-/
+      if (!options.disableRemovePrevious) {
+        // Removes previous deployments 👍
+        try {
+          TerminalUtils.infoPkg(pkg, `Removing unaliased deployments...`)
+          await ChildProcessUtils.execPkg(pkg, 'now', [
+            'rm',
+            deploymentName,
+            '--safe',
+            '-y',
+          ])
+        } catch (err) {
+          TerminalUtils.errorPkg(
+            pkg,
+            'Failed to remove previous deployments. There may not have been any previous deployments.',
+          )
+          TerminalUtils.verbosePkg(pkg, err.stack)
+        }
+      }
+
+      const { pathAlias } = options
+
+      if (pathAlias != null) {
+        const { rules } = pathAlias
+
+        if (rules != null) {
+          TerminalUtils.infoPkg(pkg, 'Attaching path alias rules...')
+          const aliasRulesPath = tempWrite.sync()
+
+          const containsDestRule = rules.find(x => !!x.dest)
+
+          if (!containsDestRule) {
+            rules.push({
+              dest: deploymentId,
+            })
+          }
+
+          writeJsonFile.sync(pathAlias)
+
+          await ChildProcessUtils.execPkg(pkg, 'now', [
+            'alias',
+            alias,
+            '-r',
+            aliasRulesPath,
+          ])
+        }
+      }
     }
 
     TerminalUtils.successPkg(pkg, `Deployment successful`)

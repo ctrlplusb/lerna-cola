@@ -17,6 +17,7 @@ Clean, build, develop, and deploy your packages utilising a rich plugin ecosyste
 - [(Not Really) Requirements](#not-really-requirements)
 - [Installation](#installation)
 - [Sample Application](#sample-application)
+- [Video Walkthrough](#video-walkthrough)
 - [Configuration](#configuration)
   - [Example Configuration](#example-configuration)
   - [Configuration Schema](#configuration-schema)
@@ -28,14 +29,18 @@ Clean, build, develop, and deploy your packages utilising a rich plugin ecosyste
   - [Core Plugins](#core-plugins)
   - [Official Plugins](#official-plugins)
   - [3rd Party Plugins](#3rd-party-plugins)
-- [Schemas](#schemas)
-  - [`Package` Schema](#package-schema)
-  - [`Config` Schema](#package-schema)
 - [Plugin Development](#plugin-development)
+  - [Clean Plugin](#clean-plugin)
+  - [Build Plugin](#build-plugin)
+  - [Develop Plugin](#develop-plugin)
+  - [Deploy Plugin](#deploy-plugin)
+  - [Schemas](#schemas)
+    - [`Package` Schema](#package-schema)
+    - [`Config` Schema](#package-schema)
 
 ## Introduction
 
-[Lerna](https://lernajs.io/) makes it crazy easy to manage cross package dependencies and provides sane methods to version them. It takes away the fear of creating and maintaining packages allowing us to fully embrace the Node.js module ethos of creating packages with isolated responsibilities.
+[Lerna](https://lernajs.io/) makes it crazy easy to manage cross package dependencies and provides sane methods to version them. It takes away the fear of creating and maintaining a wide set of packages, allowing us to fully embrace the module ethos by creating packages with isolated responsibilities.
 
 Lerna Cola wants to build on top of these core principles by providing the following additional features:
 
@@ -47,19 +52,19 @@ You access the features via one of the 4 CLI commands that Lerna Cola provides: 
 
 The commands utilise a rich plugin eco-system, allowing for 3rd party contributions.
 
-Lift your build, development and deployment configurations to the root of your monorepo, keep your packages clean, and utilise the full benefits of a monorepo structure.
+Lift your build, development and deployment to the root of your monorepo, keep your packages clean, and utilise the full benefits of a monorepo structure.
 
 ## Requirements
 
 - **Node >= 8**
 
-  Version 8 was LTS at the time of writing this so a decision was made to run with it. This of course is only a requirement for the `lerna-cola` CLI, your packages can have their own individual engine requirements.
+  Version 8 was LTS at the time of writing this so a decision was made to run with it.
 
 ## (Not Really) Requirements
 
 - **[Lerna](https://lernajs.io/)**
 
-  To tell you the truth, we don't strictly require that you use Lerna. You could very well use straight up Yarn workspaces, but in our opinion you would be missing out on some cool features. We very very very much recommend that you use this library in conjunction with Lerna.
+  To tell you the truth, we don't strictly require that you use Lerna. You could very well use straight up Yarn workspaces or any other monorepo enabling tool, but in our opinion you would be missing out on some very cool features that Lerna provides.
 
 ## Installation
 
@@ -77,21 +82,25 @@ npm i @lerna-cola/cli -D
 
 ## Sample Application
 
-We definitely recommend that you read the documentation below to gain a full understanding of Lerna Cola, however, we want to highlight early on that a sample application is maintained here:
+We definitely recommend that you read the all of the documentation first in order to gain a better understanding of Lerna Cola, however, we want to highlight early on that a sample application is maintained here:
 
 - https://github.com/ctrlplusb/lerna-cola-sample
 
-It provides a great way for you to quickly clone and run a non-trivial project in order to assess the benefits that Lerna Cola could bring to your projects.
+This provides a great way for you to quickly clone and run a non-trivial project in order to assess the benefits that Lerna Cola could bring to your monorepos.
+
+## Video Walkthrough
+
+> Coming soon
 
 ## Configuration
 
-To use the Lerna Cola CLI you will need to create a configuration file named either `lerna-cola.json` or `lerna-cola.js` within the root of your project.
+To use Lerna Cola you will need to create a configuration file named either `lerna-cola.json` or `lerna-cola.js` within the root of your monorepo.
 
 > Note: When creating a `.js` file ensure that you export the configuration object via `module.exports`.
 
 ### Example Configuration
 
-Before we describe the configuration schema, it may be helpful to review a typical configuration:
+Before we describe the configuration schema, it may be helpful to review a "typical" configuration:
 
 ```javascript
 module.exports = {
@@ -248,11 +257,13 @@ When executed it will run all of the configured plugins for all of your packages
 
 ### develop
 
-Run a full auto/hot reloading development environment in which any changes to one package cascade through your package dependency tree. No more need to manually rebuild/restart servers during development allow for a blazingly hot development experience.
+Run a full auto-reloading development environment in which any changes to one package cascade through your package dependency tree. No more need to manually rebuild/restart servers during development allow for a blazingly hot development experience.
 
-For packages without a `developPlugin` configured, they will have their source or build output watched, with any changes causing notifications to be send down the dependency tree. Any packages running with a `developPlugin` can then respond to these and their own changes in order to auto/hot reload appropriately.
+All of your packages will be watched (even the ones without any explicit configuration within your [configuration](#configuration)), with any changes being propagated through the dependency tree subsequently executing any "develop" plugins that are configured against your projects.
 
-All of the logs/output from your packages will be managed and printed within the console window where you ran the `develop` command. The output contains a uniquely colored column to the left allowing you to easily identify the output for each respective package.
+> Note: If you provide a "build" plugin against on your packages, but no explicit "develop" plugin, then the system will automatically execute the "build" plugin when handling changes.
+
+All of the logs/output from your packages will be "merged" and printed within the console window where you ran the `develop` command. The console output contains a uniquely colored column to the left allowing you to easily identify the output for each respective package.
 
 ### deploy
 
@@ -461,23 +472,111 @@ module.exports = {
 
 #### `@lerna-cola/plugin-deploy-now`
 
-> TODO
+A [deploy](#deploy) command plugin.
+
+This plugin allows your package to be deployed to Zeit's [now](https://zeit.co/now) cloud service.
+
+For this plugin to work you need the following two environment variables configured:
+
+- NOW_USERNAME
+
+  The username of the Zeit account you are deploying against.
+
+- NOW_TOKEN
+
+  An [API token](https://zeit.co/blog/introducing-api-tokens-management) generated against your Zeit account.
+
+**Options**
+
+This plugin supports the following options:
+
+- `settings` (_Object_, **optional**)
+
+  Any [settings](https://zeit.co/docs/features/configuration#settings) officially supported by now.
+
+  We highly recommend you set the `alias` setting.
+
+  Some defaults are automatically applied by the plugin, but you can override them:
+
+  ```javascript
+  {
+    forwardNpm: true,
+    public: false
+  }
+  ```
+
+- `disableRemovePrevious` (_boolean_, **optional**, **default**: false)
+
+  If you provide an `alias` within the `settings` option then this plugin will by default remove any previous deployments that were deployed against the target alias. This avoids any unnecessary build up of old deployments, which can become tedious to manage.
+
+  Set this to `true` to prevent the removal of prior deployments of an alias target.
+
+- `deployTimeoutMins` (_number_, **optional**, **default**: 15)
+
+  The number of minutes to wait before timing out the deployment, subsequently stopping the deployment process with a failure indicated.
+
+- `passThroughEnvVars` (_Array&lt;string&gt;_ , **optional**)
+
+  An array of strings, describing which environment variables (currently available on your `process.env`) should be passed into the now deployment.
+
+  e.g.
+
+  ```javascript
+  // lerna-cola.js
+  module.exports = {
+    packages: {
+      'my-app': {
+        deployPlugin: {
+          name: '@lerna-cola/plugin-deploy-now',
+          options: {
+            alias: 'my-app.com',
+            passThroughEnvVars: ['MY_DB_USERNAME', 'MY_DB_PASSWORD'],
+          },
+        },
+      },
+    },
+  }
+  ```
+
+- `pathAlias` (_Object_, **optional**)
+
+  An now path alias [settings](https://zeit.co/docs/features/path-aliases#path-alias) to be applied to the deployment.
+
+  > Note: the deployment id will automatically be added as a "dest" rule for you if you do not supply the "dest" within the rules.
+
+  This setting also requires that you supplied an `alias` for the deployment via the `settings.alias` option.
+
+**Example**
+
+```javascript
+// lerna-cola.js
+module.exports = {
+  packages: {
+    'my-app': {
+      buildPlugin: {
+        name: '@lerna-cola/plugin-deploy-now',
+        options: {
+          settings: {
+            alias: 'my-app.com',
+            sfo1: {
+              sfo1: {
+                min: 1,
+                max: 5,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
 
 ### 3rd Party Plugins
 
 Hopefully we will have some soon. 🤞
 
 Please submit a PR to add yours here.
-
-## Schemas
-
-### `Package` Schema
-
-The holy grail of information for your plugins.
-
-### `Config` Schema
-
-> TODO
 
 ## Plugin Development
 
@@ -491,4 +590,32 @@ Your plugin factory will receive two arguments:
 
   The package for which the plugin is assigned. This contains lots of really useful information about the package, such as it's dependency tree, src and build output paths etc. Please see the full schema for the [Package Schema](#package-schema) to see what is available to you.
 
-> TODO Plugin API etc
+> TODO complete...
+
+### Clean Plugin
+
+> TODO
+
+### Build Plugin
+
+> TODO
+
+### Develop Plugin
+
+> TODO
+
+### Deploy Plugin
+
+> TODO
+
+### Schemas
+
+Below are schemas of the arguments that are provided to your plugins.
+
+#### `Package` Schema
+
+The holy grail of information for your plugins.
+
+#### `Config` Schema
+
+> TODO
