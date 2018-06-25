@@ -3,9 +3,15 @@
 import type { Package } from '@lerna-cola/lib/build/types'
 
 const pSeries = require('p-series')
-const { config, TerminalUtils } = require('@lerna-cola/lib')
+const { config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 
 module.exports = async function deploymentService() {
+  // First we need to make sure we have built all packages
+  await pSeries(
+    config().packages.map(pkg => () => PackageUtils.buildPackage(pkg)),
+  )
+
+  // Determine which packages have a deployment plugin configured
   const packagesWithDeployConfig = config().packages.filter(
     pkg => !!pkg.plugins.deployPlugin,
   )
@@ -16,29 +22,31 @@ module.exports = async function deploymentService() {
     process.exit(1)
   }
 
-  // const namesOfPackagesToDeploy = await TerminalUtils.multiSelect(
-  //   'Which packages would you like to deploy?',
-  //   {
-  //     choices: packagesWithDeployConfig.map(x => ({
-  //       value: x.name,
-  //       text: `${x.name} (${x.version})`,
-  //     })),
-  //   },
-  // )
+  // Ask which packages to deploy?
+  const namesOfPackagesToDeploy = await TerminalUtils.multiSelect(
+    'Which packages would you like to deploy?',
+    {
+      choices: packagesWithDeployConfig.map(x => ({
+        value: x.name,
+        text: `${x.name} (${x.version})`,
+      })),
+    },
+  )
 
-  const namesOfPackagesToDeploy = packagesWithDeployConfig.map(x => x.name)
-
+  // Ensure at least one package was selected for deploymnet
   if (namesOfPackagesToDeploy.length === 0) {
     TerminalUtils.info('No packages selected. Exiting...')
     process.exit(0)
   }
 
+  // Map the package names to packages
   const packagesToDeploy = namesOfPackagesToDeploy.map(
     x => config().packageMap[x],
   )
 
   TerminalUtils.info('Deploying packages...')
 
+  // Deploy each of the packages
   await pSeries(
     packagesToDeploy.map((pkg: Package) => async () => {
       const deployPlugin = pkg.plugins.deployPlugin
