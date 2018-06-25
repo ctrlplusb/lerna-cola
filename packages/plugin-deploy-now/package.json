@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.1.18",
+  "version": "0.1.19",
   "name": "@lerna-cola/plugin-deploy-now",
   "description": "Allows deployment of lerna-cola projects to Zeit's now",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
