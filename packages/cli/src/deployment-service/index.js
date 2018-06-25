@@ -16,17 +16,19 @@ module.exports = async function deploymentService() {
     process.exit(1)
   }
 
-  const namesOfPackagesToDeploy = await TerminalUtils.multiSelect(
-    'Which packages would you like to deploy?',
-    {
-      choices: packagesWithDeployConfig.map(x => ({
-        value: x.name,
-        text: `${x.name} (${x.version})`,
-      })),
-    },
-  )
+  // const namesOfPackagesToDeploy = await TerminalUtils.multiSelect(
+  //   'Which packages would you like to deploy?',
+  //   {
+  //     choices: packagesWithDeployConfig.map(x => ({
+  //       value: x.name,
+  //       text: `${x.name} (${x.version})`,
+  //     })),
+  //   },
+  // )
 
-  if (namesOfPackagesToDeploy.value.length === 0) {
+  const namesOfPackagesToDeploy = packagesWithDeployConfig.map(x => x.name)
+
+  if (namesOfPackagesToDeploy.length === 0) {
     TerminalUtils.info('No packages selected. Exiting...')
     process.exit(0)
   }

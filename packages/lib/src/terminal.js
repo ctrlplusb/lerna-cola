@@ -17,11 +17,6 @@ type MultiSelectOptions = {
   validate?: (Array<string>) => boolean | string,
 }
 
-type MultiValueAnswer = {
-  type: string,
-  value: Array<string>,
-}
-
 type SelectOptions = {
   choices: Array<string>,
   selected?: string,
@@ -122,7 +117,7 @@ function headerPkg(pkg: Package, msg: string): void {
 function multiSelect(
   message: string,
   options: MultiSelectOptions,
-): Promise<MultiValueAnswer> {
+): Promise<Array<string>> {
   const { choices, selected, validate } = options
   return inquirer
     .prompt([

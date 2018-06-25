@@ -130,12 +130,18 @@ const nowDeployPlugin: DeployPlugin = {
       cwd: pkg.paths.packageRoot,
     })
     const deploymentIdRegex = /(https:\/\/.+\.now\.sh)/g
-    if (!deploymentIdRegex.test(deployResponse)) {
-      // Todo error
+    if (!deploymentIdRegex.test(deployResponse.stdout)) {
+      TerminalUtils.errorPkg(
+        pkg,
+        'No deployment id could be found, could not complete deployment',
+      )
       process.exit(1)
     }
-    const deploymentId = deployResponse.match(deploymentIdRegex)[0]
-    TerminalUtils.infoPkg(pkg, `Creating deployment (${deploymentId})...`)
+    const deploymentId = deployResponse.stdout.match(deploymentIdRegex)[0]
+    TerminalUtils.infoPkg(
+      pkg,
+      `Waiting for deployment (${deploymentId}) to be ready...`,
+    )
 
     // Now we need to wait for the deployment to be ready.
 
@@ -148,7 +154,7 @@ const nowDeployPlugin: DeployPlugin = {
       TerminalUtils.errorPkg(
         pkg,
         dedent(`
-          The deployment process timed out. :( There may be an issue with your deployment or with "now". You could try to manually deploy using the following commands to gain more insight into the issue:
+          The deployment process timed out. There may be an issue with your deployment or with "now". You could try a manually deployment using the following commands to gain more insight into the issue:
 
             ${chalk.blue(`cd ${pkg.paths.packageRoot}`)}
             ${chalk.blue(`now ${args.join(' ')}`)}
@@ -190,7 +196,10 @@ const nowDeployPlugin: DeployPlugin = {
       if (!options.disableRemovePrevious) {
         // Removes previous deployments 👍
         try {
-          TerminalUtils.infoPkg(pkg, `Removing unaliased deployments...`)
+          TerminalUtils.infoPkg(
+            pkg,
+            `Checking to see if there are any previous deployments to remove...`,
+          )
           await ChildProcessUtils.execPkg(pkg, 'now', [
             'rm',
             deploymentName,
@@ -198,10 +207,7 @@ const nowDeployPlugin: DeployPlugin = {
             '-y',
           ])
         } catch (err) {
-          TerminalUtils.errorPkg(
-            pkg,
-            'Failed to remove previous deployments. There may not have been any previous deployments.',
-          )
+          TerminalUtils.infoPkg(pkg, 'No previous deployments to remove.')
           TerminalUtils.verbosePkg(pkg, err.stack)
         }
       }
