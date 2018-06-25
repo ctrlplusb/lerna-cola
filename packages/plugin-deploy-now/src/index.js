@@ -112,7 +112,7 @@ const nowDeployPlugin: DeployPlugin = {
         },
       },
     )
-    writeJsonFile.sync(nowSettingsPath, nowSettings)
+    fs.outputJsonSync(nowSettingsPath, nowSettings)
 
     const args = [
       'deploy',
