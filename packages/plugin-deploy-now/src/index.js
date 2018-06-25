@@ -95,35 +95,25 @@ const nowDeployPlugin: DeployPlugin = {
 
     const nowSettingsPath = tempWrite.sync()
     const nowSettings = deepMerge(
-      deepMerge(
-        // Defaults
-        {
-          forwardNpm: true,
-          public: false,
-        },
-        // User overrides
-        options.settings || {},
-      ),
-      // These must be provided via the env for forced safety:
+      // Defaults
       {
-        token: process.env.NOW_TOKEN,
-        user: {
-          username: process.env.NOW_USERNAME,
-        },
+        forwardNpm: true,
+        public: false,
       },
+      // User overrides
+      options.settings || {},
     )
     fs.outputJsonSync(nowSettingsPath, nowSettings)
+    TerminalUtils.verbosePkg(pkg, nowSettings)
 
     const args = [
       'deploy',
       '-n',
       deploymentName,
       ...envVars,
-      '-c',
+      '-A',
       nowSettingsPath,
       '-C',
-      '-t',
-      process.env.NOW_TOKEN || '',
     ]
 
     const deployResponse = await ChildProcessUtils.execPkg(pkg, 'now', args, {
@@ -221,10 +211,17 @@ const nowDeployPlugin: DeployPlugin = {
           TerminalUtils.infoPkg(pkg, 'Attaching path alias rules...')
           const aliasRulesPath = tempWrite.sync()
 
-          const containsDestRule = rules.find(x => !!x.dest)
+          const containsDestRule = rules.find(
+            x =>
+              typeof x === 'object' && Object.keys(x).length === 1 && !!x.dest,
+          )
 
           if (!containsDestRule) {
-            rules.push({
+            TerminalUtils.infoPkg(
+              pkg,
+              `Adding dest ${deploymentId} to path alias rules...`,
+            )
+            pathAlias.rules.push({
               dest: deploymentId,
             })
           }
@@ -233,7 +230,7 @@ const nowDeployPlugin: DeployPlugin = {
 
           await ChildProcessUtils.execPkg(pkg, 'now', [
             'alias',
-            alias,
+            alias.indexOf('.') === -1 ? `${alias}.now.sh` : alias,
             '-r',
             aliasRulesPath,
           ])
