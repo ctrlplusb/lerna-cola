@@ -28,6 +28,7 @@
     "p-map": "^1.2.0",
     "p-series": "1.1.0",
     "pify": "^3.0.0",
+    "pretty-format": "^23.0.1",
     "ramda": "0.25.0",
     "read-pkg": "3.0.0",
     "rimraf": "^2.6.2",

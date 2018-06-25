@@ -39,14 +39,15 @@ type ConfirmAnswer = {
 
 const chalk = require('chalk')
 const inquirer = require('inquirer')
+const prettyFormat = require('pretty-format')
 
-const formatVerbose = msg => chalk.dim(msg)
-const formatError = msg => chalk.red.bold(msg)
-const formatWarning = msg => chalk.yellow(msg)
-const formatTitle = msg => chalk.bold.magenta(msg)
-const formatInfo = msg => chalk.blue(msg)
-const formatSuccess = msg => chalk.green(msg)
-const formatHeader = msg => chalk.bold(msg)
+const formatVerbose = msg => chalk.dim(prettyFormat(msg))
+const formatError = msg => chalk.red.bold(prettyFormat(msg))
+const formatWarning = msg => chalk.yellow(prettyFormat(msg))
+const formatTitle = msg => chalk.bold(prettyFormat(msg))
+const formatInfo = msg => prettyFormat(msg)
+const formatSuccess = msg => chalk.green(prettyFormat(msg))
+const formatHeader = msg => chalk.bold(prettyFormat(msg))
 
 function verbose(msg: string): void {
   if (process.env.VERBOSE) {
