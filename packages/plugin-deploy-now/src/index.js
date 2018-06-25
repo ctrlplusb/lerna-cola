@@ -8,7 +8,7 @@ const dedent = require('dedent')
 const chalk = require('chalk')
 const deepMerge = require('deepmerge')
 const tempWrite = require('temp-write')
-const writeJsonFile = require('write-json-file')
+const fs = require('fs-extra')
 const { TerminalUtils, ChildProcessUtils } = require('@lerna-cola/lib')
 
 type NowSettings = {
@@ -229,7 +229,7 @@ const nowDeployPlugin: DeployPlugin = {
             })
           }
 
-          writeJsonFile.sync(pathAlias)
+          fs.outputJsonSync(aliasRulesPath, pathAlias)
 
           await ChildProcessUtils.execPkg(pkg, 'now', [
             'alias',
