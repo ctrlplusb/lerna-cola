@@ -25,7 +25,6 @@ const killChildProcessFor = (pkg: Package): Promise<void> => {
   })
 }
 
-// :: (Package) -> Promise
 module.exports = function develop(pkg: Package): Promise<DevelopInstance> {
   const startServer = (): Promise<void> =>
     new Promise((resolve, reject) => {
@@ -39,6 +38,7 @@ module.exports = function develop(pkg: Package): Promise<DevelopInstance> {
           cwd: pkg.paths.packageRoot,
         },
       )
+
       childProcess.catch(err => {
         TerminalUtils.verbosePkg(pkg, `Error starting`)
         reject(err)

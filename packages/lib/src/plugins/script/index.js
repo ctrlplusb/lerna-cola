@@ -23,6 +23,10 @@ type Options = {|
 
 type TaskName = 'build' | 'develop' | 'deploy' | 'clean'
 
+type Config = {
+  managed: boolean,
+}
+
 type ChildProcessMap = {
   [key: TaskName]: {
     [key: string]: ChildProcess,
@@ -64,7 +68,7 @@ const killChildProcessFor = (pkg: Package, task: TaskName) => {
   })
 }
 
-const runScript = (task: TaskName) => async (
+const runScript = (task: TaskName, config: Config) => async (
   pkg: Package,
   options: Options,
 ) => {
@@ -78,72 +82,90 @@ const runScript = (task: TaskName) => async (
 
   const pkgJson = readPkg.sync(pkg.paths.packageJson)
 
-  const returnAPI: DevelopInstance = {
-    kill: () => killChildProcessFor(pkg, task),
+  const scriptCmd = R.path(['scripts', options.scriptName], pkgJson)
+  if (!scriptCmd || R.isEmpty(scriptCmd)) {
+    throw new Error(
+      `Could not resolve script named "${options.scriptName}" on ${pkg.name}`,
+    )
   }
 
-  const existingProcess = getChildProcess(pkg, task)
-  if (existingProcess && !options.runForEveryChange) {
-    // $FlowFixMe
-    return task === 'develop' ? returnAPI : undefined
-  }
-
-  if (existingProcess) {
-    await killChildProcessFor(pkg, task)
-  }
-
-  await new Promise((resolve, reject) => {
-    const scriptCmd = R.path(['scripts', options.scriptName], pkgJson)
-    if (!scriptCmd || R.isEmpty(scriptCmd)) {
-      throw new Error(
-        `Could not resolve script named "${options.scriptName}" on ${pkg.name}`,
-      )
+  if (config.managed) {
+    const returnAPI: DevelopInstance = {
+      kill: () => killChildProcessFor(pkg, task),
     }
 
-    TerminalUtils.infoPkg(pkg, `Executing script "${options.scriptName}"`)
+    const existingProcess = getChildProcess(pkg, task)
+    if (existingProcess && !options.runForEveryChange) {
+      // $FlowFixMe
+      return task === 'develop' ? returnAPI : undefined
+    }
 
-    const childProcess = ChildProcessUtils.execPkg(
-      pkg,
-      'npm',
-      ['run', options.scriptName],
-      {
-        cwd: pkg.paths.packageRoot,
-      },
-    )
+    if (existingProcess) {
+      await killChildProcessFor(pkg, task)
+    }
 
-    childProcess.catch(err => {
-      TerminalUtils.verbosePkg(
+    await new Promise((resolve, reject) => {
+      TerminalUtils.infoPkg(pkg, `Executing script "${options.scriptName}"`)
+
+      const childProcess = ChildProcessUtils.execPkg(
         pkg,
-        `Error executing script "${options.scriptName}"`,
+        'npm',
+        ['run', options.scriptName],
+        {
+          cwd: pkg.paths.packageRoot,
+        },
       )
-      reject(err)
-    })
 
-    // Give the catch above a tick of space, so that it can resolve any
-    // error that may have occurred
-    process.nextTick(() => {
-      childProcess.on('close', () => {
+      childProcess.catch(err => {
         TerminalUtils.verbosePkg(
           pkg,
-          `Stopped script "${options.scriptName}" process`,
+          `Error executing script "${options.scriptName}"`,
         )
+        reject(err)
       })
-      addChildProcess(pkg, task, childProcess)
-      resolve()
-    })
-  })
 
-  // $FlowFixMe
-  return task === 'develop' ? returnAPI : undefined
+      // Give the catch above a tick of space, so that it can resolve any
+      // error that may have occurred
+      process.nextTick(() => {
+        childProcess.on('close', () => {
+          TerminalUtils.verbosePkg(
+            pkg,
+            `Stopped script "${options.scriptName}" process`,
+          )
+        })
+        addChildProcess(pkg, task, childProcess)
+        resolve()
+      })
+    })
+
+    return returnAPI
+  }
+
+  TerminalUtils.infoPkg(pkg, `Executing script "${options.scriptName}"`)
+
+  try {
+    await ChildProcessUtils.execPkg(pkg, 'npm', ['run', options.scriptName], {
+      cwd: pkg.paths.packageRoot,
+    })
+  } catch (err) {
+    TerminalUtils.errorPkg(
+      pkg,
+      `Error executing script "${options.scriptName}"`,
+      err,
+    )
+    process.exit(1)
+  }
+
+  return undefined
 }
 
 const scriptPlugin: CleanPlugin & BuildPlugin & DevelopPlugin & DeployPlugin = {
   name: 'plugin-script',
-  build: runScript('build'),
-  clean: runScript('clean'),
+  build: runScript('build', { managed: false }),
+  clean: runScript('clean', { managed: false }),
   // $FlowFixMe
-  develop: runScript('develop'),
-  deploy: runScript('deploy'),
+  develop: runScript('develop', { managed: true }),
+  deploy: runScript('deploy', { managed: false }),
 }
 
 module.exports = scriptPlugin
