@@ -211,21 +211,6 @@ const nowDeployPlugin: DeployPlugin = {
           TerminalUtils.infoPkg(pkg, 'Attaching path alias rules...')
           const aliasRulesPath = tempWrite.sync()
 
-          const containsDestRule = rules.find(
-            x =>
-              typeof x === 'object' && Object.keys(x).length === 1 && !!x.dest,
-          )
-
-          if (!containsDestRule) {
-            TerminalUtils.infoPkg(
-              pkg,
-              `Adding dest ${deploymentId} to path alias rules...`,
-            )
-            pathAlias.rules.push({
-              dest: deploymentId,
-            })
-          }
-
           fs.outputJsonSync(aliasRulesPath, pathAlias)
 
           await ChildProcessUtils.execPkg(pkg, 'now', [

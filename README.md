@@ -501,15 +501,17 @@ A [deploy](#deploy) command plugin.
 
 This plugin allows your package to be deployed to Zeit's [now](https://zeit.co/now) cloud service.
 
-For this plugin to work you need the following two environment variables configured:
+For this plugin to work you need to have installed the `now` CLI, i.e.:
 
-- NOW_USERNAME
+```bash
+npm i -g now
+```
 
-  The username of the Zeit account you are deploying against.
+You also need to ensure that you have logged into your `now` account:
 
-- NOW_TOKEN
-
-  An [API token](https://zeit.co/blog/introducing-api-tokens-management) generated against your Zeit account.
+```bash
+now login
+```
 
 **Options**
 
@@ -565,11 +567,9 @@ This plugin supports the following options:
 
 - `pathAlias` (_Object_, **optional**)
 
-  An now path alias [settings](https://zeit.co/docs/features/path-aliases#path-alias) to be applied to the deployment.
+  Any `now` [path alias rules](https://zeit.co/docs/features/path-aliases#path-alias) to be applied to the deployment.
 
-  > Note: the deployment id will automatically be added as a "dest" rule for you if you do not supply the "dest" within the rules.
-
-  This setting also requires that you supplied an `alias` for the deployment via the `settings.alias` option.
+  This is a really helpful setting, allowing you to proxy paths of your deployment to other deployments.
 
 **Example**
 
