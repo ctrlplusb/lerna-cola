@@ -9,13 +9,10 @@ const buildCommand = require('../commands/build')
 const cleanCommand = require('../commands/clean')
 const developCommand = require('../commands/develop')
 const deployCommand = require('../commands/deploy')
-const preventScriptExit = require('../utils/prevent-script-exit')
+const preventScriptExit = require('../lib/prevent-script-exit')
+const handleError = require('../lib/handle-error')
 
-const onComplete = (err, output) => {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  }
+const onComplete = output => {
   if (output) {
     console.log(output)
   }
@@ -38,16 +35,19 @@ if (args.length > 0) {
     TerminalUtils.verbose(argv)
     if (argv.promisedResult) {
       TerminalUtils.verbose('Waiting for async command to complete...')
-      argv.promisedResult.then(
-        result => onComplete(null, result),
-        error => onComplete(error),
-      )
+      argv.promisedResult.catch(handleError).then(onComplete)
     } else {
-      onComplete(err, output)
+      if (err) {
+        handleError(err)
+      }
+      onComplete(output)
     }
   })
 } else {
   yargs.parse()
 }
+
+process.on('uncaughtException', handleError)
+process.on('unhandledRejection', handleError)
 
 preventScriptExit()

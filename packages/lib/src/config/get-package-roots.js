@@ -6,7 +6,6 @@
 
 const globby = require('globby')
 const path = require('path')
-const TerminalUtils = require('../terminal')
 
 module.exports = function resolvePackageRoots(
   packageSources: Array<string> = ['packages/*'],
@@ -25,10 +24,9 @@ module.exports = function resolvePackageRoots(
 
   if (hasGlobStar) {
     if (hasNodeModules) {
-      TerminalUtils.error(
+      throw new Error(
         'An explicit node_modules package path does not allow globstars (**)',
       )
-      process.exit(1)
     }
 
     globOpts.ignore.push(

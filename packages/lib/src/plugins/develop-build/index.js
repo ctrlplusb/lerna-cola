@@ -3,17 +3,15 @@
 import type { Package, DevelopPlugin } from '../../types'
 
 const PackageUtils = require('../../packages')
-const TerminalUtils = require('../../terminal')
+const { PackageError } = require('../../errors')
 
 const developBuildPlugin: DevelopPlugin = {
   name: 'plugin-develop-build',
   clean: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"clean" not supported by "build" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"clean" not supported by "build" plugin')
   },
   build: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"build" not supported by "build" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"build" not supported by "build" plugin')
   },
   develop: (pkg: Package) =>
     PackageUtils.buildPackage(pkg)
@@ -21,8 +19,7 @@ const developBuildPlugin: DevelopPlugin = {
       // develop instance with kill cmd etc
       .then(() => ({ kill: () => Promise.resolve(undefined) })),
   deploy: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"deploy" not supported by "build" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"deploy" not supported by "build" plugin')
   },
 }
 

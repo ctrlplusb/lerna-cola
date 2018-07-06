@@ -5,7 +5,7 @@ import type { Package, CleanPlugin } from '../../types'
 const rimraf = require('rimraf')
 const pify = require('pify')
 const PackageUtils = require('../../packages')
-const TerminalUtils = require('../../terminal')
+const { PackageError } = require('../../errors')
 
 const rimrafAsync = pify(rimraf)
 
@@ -13,8 +13,7 @@ const cleanBuildPlugin: CleanPlugin = {
   name: 'plugin-clean-build',
   clean: (pkg: Package) => rimrafAsync(pkg.paths.packageBuildOutput),
   build: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"build" not supported by "build" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"build" not supported by "build" plugin')
   },
   develop: (pkg: Package) =>
     PackageUtils.buildPackage(pkg)
@@ -22,8 +21,7 @@ const cleanBuildPlugin: CleanPlugin = {
       // develop instance with kill cmd etc
       .then(() => ({ kill: () => Promise.resolve(undefined) })),
   deploy: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"deploy" not supported by "build" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"deploy" not supported by "build" plugin')
   },
 }
 

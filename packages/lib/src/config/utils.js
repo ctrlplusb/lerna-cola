@@ -111,9 +111,7 @@ const getPlugin = (
     }
   } catch (err) {
     console.error(`Failed to load "${pluginType}" for ${packageName}`)
-    console.error(err)
-    process.exit(1)
-    throw new Error('💩')
+    throw err
   }
 }
 

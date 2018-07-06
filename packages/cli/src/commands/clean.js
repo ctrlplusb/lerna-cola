@@ -2,7 +2,7 @@
 
 const { config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 const pSeries = require('p-series')
-const asyncCommandHandler = require('../utils/async-command-handler')
+const asyncCommand = require('../lib/async-command')
 
 module.exports = {
   command: 'clean',
@@ -13,7 +13,7 @@ module.exports = {
       describe: 'The packages to clean',
       type: 'array',
     }),
-  handler: asyncCommandHandler(async () => {
+  handler: asyncCommand(async () => {
     try {
       TerminalUtils.title('Running clean command...')
       const clean = pkg => () => PackageUtils.cleanPackage(pkg)

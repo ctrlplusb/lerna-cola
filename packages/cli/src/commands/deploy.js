@@ -2,12 +2,12 @@
 
 const { TerminalUtils } = require('@lerna-cola/lib')
 const deploymentService = require('../deployment-service')
-const asyncCommandHandler = require('../utils/async-command-handler')
+const asyncCommand = require('../lib/async-command')
 
 module.exports = {
   command: 'deploy',
   desc: 'Executes the deployment process',
-  handler: asyncCommandHandler(async () => {
+  handler: asyncCommand(async () => {
     try {
       if (!process.env.NODE_ENV) {
         process.env.NODE_ENV = 'production'

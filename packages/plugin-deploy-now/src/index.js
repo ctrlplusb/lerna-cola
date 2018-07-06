@@ -9,7 +9,11 @@ const chalk = require('chalk')
 const deepMerge = require('deepmerge')
 const tempWrite = require('temp-write')
 const fs = require('fs-extra')
-const { TerminalUtils, ChildProcessUtils } = require('@lerna-cola/lib')
+const {
+  TerminalUtils,
+  ChildProcessUtils,
+  Errors: { PackageError },
+} = require('@lerna-cola/lib')
 
 type NowSettings = {
   forwardNpm?: boolean,
@@ -41,16 +45,13 @@ type Options = {
 const nowDeployPlugin: DeployPlugin = {
   name: '@lerna-cola/plugin-now',
   build: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"build" not supported by "now" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"build" not supported by "now" plugin')
   },
   clean: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"clean" not supported by "now" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"clean" not supported by "now" plugin')
   },
   develop: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"develop" not supported by "now" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"develop" not supported by "now" plugin')
   },
   deploy: async (pkg: Package, options: Options) => {
     try {
@@ -104,11 +105,10 @@ const nowDeployPlugin: DeployPlugin = {
       })
       const deploymentIdRegex = /(https:\/\/.+\.now\.sh)/g
       if (!deploymentIdRegex.test(deployResponse.stdout)) {
-        TerminalUtils.errorPkg(
+        throw new PackageError(
           pkg,
           'No deployment id could be found, could not complete deployment',
         )
-        process.exit(1)
       }
       const deploymentId = deployResponse.stdout.match(deploymentIdRegex)[0]
       TerminalUtils.infoPkg(
@@ -124,7 +124,7 @@ const nowDeployPlugin: DeployPlugin = {
         if (ready) {
           return
         }
-        TerminalUtils.errorPkg(
+        throw new PackageError(
           pkg,
           dedent(`
           The deployment process timed out. There may be an issue with your deployment or with "now". You could try a manually deployment using the following commands to gain more insight into the issue:
@@ -133,7 +133,6 @@ const nowDeployPlugin: DeployPlugin = {
             ${chalk.blue(`now ${args.join(' ')}`)}
           `),
         )
-        process.exit(1)
       }, (options.deployTimeoutMins || 15) * 60 * 1000)
 
       await pWhilst(
@@ -208,8 +207,7 @@ const nowDeployPlugin: DeployPlugin = {
 
       TerminalUtils.successPkg(pkg, `Deployment successful`)
     } catch (err) {
-      TerminalUtils.errorPkg(pkg, 'Failed to deploy', err)
-      process.exit(1)
+      throw new PackageError(pkg, 'Failed to deploy', err)
     }
   },
 }

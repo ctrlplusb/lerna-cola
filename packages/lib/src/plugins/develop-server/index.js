@@ -2,34 +2,30 @@
 
 import type { Package, DevelopPlugin } from '../../types'
 
-const TerminalUtils = require('../../terminal')
 const develop = require('./develop')
+const { PackageError } = require('../../errors')
 
 const developServerPlugin: DevelopPlugin = {
   name: 'plugin-develop-server',
   build: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"build" not supported by "server" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"build" not supported by "server" plugin')
   },
   clean: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"clean" not supported by "server" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"clean" not supported by "server" plugin')
   },
   develop: (pkg: Package) => {
     if (!pkg.packageJson.main) {
-      TerminalUtils.errorPkg(
+      throw new PackageError(
         pkg,
         `You must provide a "main" within your package.json when using the "server" develop plugin. See the configuration for ${
           pkg.name
         }`,
       )
-      process.exit(1)
     }
     return develop(pkg)
   },
   deploy: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"deploy" not supported by "server" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"deploy" not supported by "server" plugin')
   },
 }
 

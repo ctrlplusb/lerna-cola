@@ -41,78 +41,78 @@ const chalk = require('chalk')
 const inquirer = require('inquirer')
 const prettyFormat = require('pretty-format')
 
-const formatVerbose = msg => chalk.dim(prettyFormat(msg))
-const formatError = msg => chalk.red.bold(prettyFormat(msg))
-const formatWarning = msg => chalk.yellow(prettyFormat(msg))
-const formatTitle = msg => chalk.bold(prettyFormat(msg))
-const formatInfo = msg => prettyFormat(msg)
-const formatSuccess = msg => chalk.green(prettyFormat(msg))
-const formatHeader = msg => chalk.bold(prettyFormat(msg))
+const formatVerbose = data => chalk.dim(prettyFormat(data))
+const formatError = data => chalk.red.bold(prettyFormat(data))
+const formatWarning = data => chalk.yellow(prettyFormat(data))
+const formatTitle = data => chalk.bold(prettyFormat(data))
+const formatInfo = data => prettyFormat(data)
+const formatSuccess = data => chalk.green(prettyFormat(data))
+const formatHeader = data => chalk.bold(prettyFormat(data))
 
-function verbose(msg: string): void {
+function verbose(data: any): void {
   if (process.env.VERBOSE) {
-    console.log(StringUtils.lernaColaMsg(formatVerbose(msg)))
+    console.log(StringUtils.lernaColaMsg(formatVerbose(data)))
   }
 }
 
-function verbosePkg(pkg: Package, msg: string): void {
+function verbosePkg(pkg: Package, data: any): void {
   if (process.env.VERBOSE) {
-    console.log(StringUtils.packageMsg(pkg, formatVerbose(msg)))
+    console.log(StringUtils.packageMsg(pkg, formatVerbose(data)))
   }
 }
 
-function error(msg: string, err?: Error): void {
-  console.log(StringUtils.lernaColaMsg(formatError(msg)))
+function error(data: string, err?: Error): void {
+  console.log(StringUtils.lernaColaMsg(formatError(data)))
   if (err && err.stack) {
     console.log(StringUtils.lernaColaMsg(StringUtils.lernaColaMsg(err.stack)))
   }
 }
 
-function errorPkg(pkg: Package, msg: string, err?: Error): void {
-  console.log(StringUtils.packageMsg(pkg, formatError(msg)))
+function errorPkg(pkg: Package, data: any, err?: Error): void {
+  console.log(StringUtils.packageMsg(pkg, formatError(data)))
   if (err && err.stack) {
     console.log(StringUtils.packageMsg(pkg, err.stack))
   }
 }
 
-function warning(msg: string): void {
-  console.log(StringUtils.lernaColaMsg(formatWarning(msg)))
+function warning(data: any): void {
+  console.log(StringUtils.lernaColaMsg(formatWarning(data)))
 }
 
-function warningPkg(pkg: Package, msg: string): void {
-  console.log(StringUtils.packageMsg(pkg, formatWarning(msg)))
+function warningPkg(pkg: Package, data: any): void {
+  console.log(StringUtils.packageMsg(pkg, formatWarning(data)))
 }
 
-function title(msg: string): void {
-  console.log(StringUtils.lernaColaMsg(formatTitle(msg)))
+function title(data: any): void {
+  console.log(StringUtils.lernaColaMsg(formatTitle(data)))
 }
 
-function titlePkg(pkg: Package, msg: string): void {
-  console.log(StringUtils.packageMsg(pkg, formatTitle(msg)))
+function titlePkg(pkg: Package, data: any): void {
+  console.log(StringUtils.packageMsg(pkg, formatTitle(data)))
 }
 
-function info(msg: string): void {
-  console.log(StringUtils.lernaColaMsg(formatInfo(msg)))
+function info(data: any): void {
+  console.log(StringUtils.lernaColaMsg(formatInfo(data)))
 }
 
-function infoPkg(pkg: Package, msg: string): void {
-  console.log(StringUtils.packageMsg(pkg, formatInfo(msg)))
+function infoPkg(pkg: Package, data: any): void {
+  console.log(StringUtils.packageMsg(pkg, formatInfo(data)))
 }
 
-function success(msg: string): void {
-  console.log(StringUtils.lernaColaMsg(formatSuccess(msg)))
+function success(data: any): void {
+  console.log(StringUtils.lernaColaMsg(formatSuccess(data)))
 }
 
-function successPkg(pkg: Package, msg: string): void {
-  console.log(StringUtils.packageMsg(pkg, formatSuccess(msg)))
+function successPkg(pkg: Package, data: any): void {
+  console.log(StringUtils.packageMsg(pkg, formatSuccess(data)))
 }
 
-function header(msg: string): void {
-  console.log(StringUtils.lernaColaMsg(formatHeader(msg)))
+function header(data: any): void {
+  console.log(StringUtils.lernaColaMsg(formatHeader(data)))
 }
 
-function headerPkg(pkg: Package, msg: string): void {
-  console.log(StringUtils.packageMsg(pkg, formatHeader(msg)))
+function headerPkg(pkg: Package, data: any): void {
+  console.log(StringUtils.packageMsg(pkg, formatHeader(data)))
 }
 
 function multiSelect(

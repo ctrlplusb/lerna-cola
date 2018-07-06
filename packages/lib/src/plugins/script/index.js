@@ -15,6 +15,7 @@ const readPkg = require('read-pkg')
 const TerminalUtils = require('../../terminal')
 const ChildProcessUtils = require('../../childProcess')
 const PluginUtils = require('../utils')
+const { PackageError } = require('../../errors')
 
 type Options = {|
   scriptName: string,
@@ -148,12 +149,11 @@ const runScript = (task: TaskName, config: Config) => async (
       cwd: pkg.paths.packageRoot,
     })
   } catch (err) {
-    TerminalUtils.errorPkg(
+    throw new PackageError(
       pkg,
       `Error executing script "${options.scriptName}"`,
       err,
     )
-    process.exit(1)
   }
 
   return undefined

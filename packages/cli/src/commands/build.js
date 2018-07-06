@@ -2,12 +2,12 @@
 
 const { config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 const pSeries = require('p-series')
-const asyncCommandHandler = require('../utils/async-command-handler')
+const asyncCommand = require('../lib/async-command')
 
 module.exports = {
   command: 'build',
   desc: 'Executes the configured build plugin for each package',
-  handler: asyncCommandHandler(async () => {
+  handler: asyncCommand(async () => {
     try {
       if (!process.env.NODE_ENV) {
         process.env.NODE_ENV = 'production'

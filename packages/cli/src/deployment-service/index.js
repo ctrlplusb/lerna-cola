@@ -16,10 +16,9 @@ module.exports = async function deploymentService() {
     pkg => !!pkg.plugins.deployPlugin,
   )
   if (packagesWithDeployConfig.length === 0) {
-    TerminalUtils.info(
+    throw new Error(
       'You do not have any packages with a deploy configuration.  Exiting...',
     )
-    process.exit(1)
   }
 
   // Ask which packages to deploy?
@@ -35,8 +34,7 @@ module.exports = async function deploymentService() {
 
   // Ensure at least one package was selected for deploymnet
   if (namesOfPackagesToDeploy.length === 0) {
-    TerminalUtils.info('No packages selected. Exiting...')
-    process.exit(0)
+    throw new Error('No packages selected. Exiting...')
   }
 
   // Map the package names to packages

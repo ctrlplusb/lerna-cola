@@ -24,8 +24,7 @@ module.exports = function filterPackages(
   const packages = config().packages
   const packagesArray = R.values(packages)
   if (packagesArray.length === 0) {
-    TerminalUtils.error('Could not find any packages.')
-    process.exit(1)
+    throw new Error('Could not find any packages.')
   }
   const result =
     packageFilters.length === 0
@@ -34,12 +33,11 @@ module.exports = function filterPackages(
           const packageNames = packagesArray.map(x => x.name)
           const invalidFilters = R.without(packageNames, packageFilters)
           if (invalidFilters.length > 0) {
-            TerminalUtils.error(
+            throw new Error(
               `The following packages could not be resolved:\n[${invalidFilters.join(
                 ',',
               )}]`,
             )
-            process.exit(1)
           }
           return packageFilters.map(x => config().packageMap[x])
         })()

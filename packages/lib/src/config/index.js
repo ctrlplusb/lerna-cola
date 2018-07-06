@@ -69,10 +69,9 @@ const config = () => {
   }
 
   if (!fs.existsSync(jsonConfigPath) && !fs.existsSync(jsConfigPath)) {
-    console.error(
+    throw new Error(
       `No lerna-cola config was found. Please create either a lerna-cola.js or a lerna-cola.json configuration file`,
     )
-    process.exit(1)
   }
 
   const lernaColaConfig: LernaColaConfig = ObjectUtils.mergeDeep(
@@ -187,10 +186,9 @@ const config = () => {
   // Ensure there are no references to unknown packages
   Object.keys(lernaColaConfig.packages).forEach(packageName => {
     if (packages.find(x => x.name === packageName) == null) {
-      console.error(
+      throw new Error(
         `There is a lerna-cola configuration for "${packageName}", however, this package could not be resolved via the packageSources configuration.`,
       )
-      process.exit(1)
     }
   })
 
@@ -203,9 +201,7 @@ const config = () => {
       {},
     ),
     terminalLabelMinLength: Math.max(
-      ...['lerna-cola', ...Object.keys(lernaColaConfig.packages)].map(
-        x => x.length,
-      ),
+      ...['lerna-cola'.length, ...packages.map(x => x.name.length)],
     ),
   }
 

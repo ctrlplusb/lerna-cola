@@ -13,7 +13,9 @@ const R = require('ramda')
 const fs = require('fs-extra')
 const globby = require('globby')
 const flowRemoveTypes = require('flow-remove-types')
-const { TerminalUtils } = require('@lerna-cola/lib')
+const {
+  Errors: { PackageError },
+} = require('@lerna-cola/lib')
 
 const maxConcurrentTranspiles = os.cpus().length
 
@@ -67,12 +69,10 @@ const flowBuildPlugin: CleanPlugin & BuildPlugin = {
       resolve()
     }),
   deploy: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"deploy" not supported by "flow" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"deploy" not supported by "flow" plugin')
   },
   develop: (pkg: Package) => {
-    TerminalUtils.errorPkg(pkg, '"develop" not supported by "flow" plugin')
-    process.exit(1)
+    throw new PackageError(pkg, '"develop" not supported by "flow" plugin')
   },
 }
 

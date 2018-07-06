@@ -41,52 +41,74 @@ type SanitisedOptions = {
 
 const babelBuildPlugin: CleanPlugin & BuildPlugin = {
   name: '@lerna-cola/plugin-build-babel',
-  build: (pkg: Package, options: Options) => {
-    const sanitiseOptions = (opts: Options): SanitisedOptions => {
-      const { config, inputs } = opts
+  build: async (pkg: Package, options: Options) => {
+    try {
+      const sanitiseOptions = (opts: Options): SanitisedOptions => {
+        const { config, inputs } = opts
 
-      if (!config || typeof config !== 'string' || typeof config === 'object') {
-        TerminalUtils.errorPkg(
-          pkg,
-          'A babel config package name or object must be provided as options',
-        )
-        process.exit(1)
-        throw new Error('💩')
-      }
+        let resolvedConfig
 
-      const resolveConfig = (packageName): Object => {
-        const module = FsUtils.resolvePackage(packageName)
-        if (typeof module !== 'function' || typeof module !== 'object') {
-          TerminalUtils.errorPkg(
-            pkg,
-            `The babel config "${packageName}" is an invalid package. Should export an object or a funciton.`,
-          )
-          process.exit(1)
+        const resolveConfig = (packageName: string): Object => {
+          const module = FsUtils.resolvePackage(packageName)
+          if (typeof module !== 'function' || typeof module !== 'object') {
+            TerminalUtils.errorPkg(
+              pkg,
+              `The babel config "${packageName}" is an invalid package. Should export an object or a funciton.`,
+            )
+          }
+          // $FlowFixMe
+          return typeof module === 'function' ? module(pkg, options) : module
         }
-        // $FlowFixMe
-        return typeof module === 'function' ? module(pkg, options) : module
+
+        if (config != null) {
+          if (typeof config !== 'string' || typeof config === 'object') {
+            TerminalUtils.errorPkg(
+              pkg,
+              'A babel config package name or object must be provided as options',
+            )
+          }
+
+          resolvedConfig =
+            typeof config === 'string' ? resolveConfig(config) : config
+        } else {
+          const packageBabelRc = path.resolve(pkg.paths.packageRoot, '.babelrc')
+          const repoBabelRc = path.resolve(pkg.paths.monoRepoRoot, '.babelrc')
+          if (fs.existsSync(packageBabelRc)) {
+            resolvedConfig = fs.readJsonSync(packageBabelRc)
+          } else if (fs.existsSync(repoBabelRc)) {
+            resolvedConfig = fs.readJsonSync(repoBabelRc)
+          } else {
+            TerminalUtils.errorPkg(
+              pkg,
+              'No babel config supplied and no .babelrc found in package or root of monorepo.',
+            )
+          }
+        }
+
+        if (!resolvedConfig) {
+          TerminalUtils.errorPkg(pkg, 'Unexpected state')
+        }
+
+        return {
+          // $FlowFixMe
+          config: resolvedConfig,
+          inputs: inputs || ['**/*.js', '**/*.jsx', '!__tests__', '!test.js'],
+        }
       }
 
-      return {
-        config: typeof config === 'string' ? resolveConfig(config) : config,
-        inputs: inputs || ['**/*.js', '**/*.jsx', '!__tests__', '!test.js'],
-      }
-    }
+      const sanitisedOptions = sanitiseOptions(options)
 
-    const sanitisedOptions = sanitiseOptions(options)
+      const patterns = sanitisedOptions.inputs.concat([
+        '!node_modules/**/*',
+        `!${path.basename(pkg.paths.packageBuildOutput)}/**/*`,
+      ])
 
-    const patterns = sanitisedOptions.inputs.concat([
-      '!node_modules/**/*',
-      `!${path.basename(pkg.paths.packageBuildOutput)}/**/*`,
-    ])
+      // :: string -> Array<string>
+      const getJsFilePaths = () =>
+        globby(patterns, {
+          cwd: pkg.paths.packageSrc,
+        })
 
-    // :: string -> Array<string>
-    const getJsFilePaths = () =>
-      globby(patterns, {
-        cwd: pkg.paths.packageSrc,
-      })
-
-    return getJsFilePaths().then(filePaths => {
       const transpileFile = filePath => {
         const writeTranspiledFile = result => {
           const outFile = path.resolve(pkg.paths.packageBuildOutput, filePath)
@@ -104,8 +126,11 @@ const babelBuildPlugin: CleanPlugin & BuildPlugin = {
 
       const limit = pLimit(maxConcurrentTranspiles)
       const queueTranspile = filePath => limit(() => transpileFile(filePath))
+      const filePaths = await getJsFilePaths()
       return Promise.all(R.map(queueTranspile, filePaths))
-    })
+    } catch (err) {
+      TerminalUtils.errorPkg(pkg, 'Unexpected error', err)
+    }
   },
   clean: (pkg: Package) =>
     new Promise(resolve => {
@@ -116,11 +141,9 @@ const babelBuildPlugin: CleanPlugin & BuildPlugin = {
     }),
   deploy: (pkg: Package) => {
     TerminalUtils.errorPkg(pkg, '"deploy" not supported by "babel" plugin')
-    process.exit(1)
   },
   develop: (pkg: Package) => {
     TerminalUtils.errorPkg(pkg, '"develop" not supported by "babel" plugin')
-    process.exit(1)
   },
 }
 
