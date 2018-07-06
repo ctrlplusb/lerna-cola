@@ -41,13 +41,15 @@ const chalk = require('chalk')
 const inquirer = require('inquirer')
 const prettyFormat = require('pretty-format')
 
-const formatVerbose = data => chalk.dim(prettyFormat(data))
-const formatError = data => chalk.red.bold(prettyFormat(data))
-const formatWarning = data => chalk.yellow(prettyFormat(data))
-const formatTitle = data => chalk.bold(prettyFormat(data))
-const formatInfo = data => prettyFormat(data)
-const formatSuccess = data => chalk.green(prettyFormat(data))
-const formatHeader = data => chalk.bold(prettyFormat(data))
+const format = data => (typeof data === 'string' ? data : prettyFormat(data))
+
+const formatVerbose = data => chalk.dim(format(data))
+const formatError = data => chalk.red.bold(format(data))
+const formatWarning = data => chalk.yellow(format(data))
+const formatTitle = data => chalk.bold(format(data))
+const formatInfo = data => format(data)
+const formatSuccess = data => chalk.green(format(data))
+const formatHeader = data => chalk.bold(format(data))
 
 function verbose(data: any): void {
   if (process.env.VERBOSE) {
