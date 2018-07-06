@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.1.21",
+  "version": "0.2.0",
   "name": "@lerna-cola/plugin-build-flow",
   "description": "Flow plugin for lerna-cola projects.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
@@ -12,7 +12,7 @@
     "build"
   ],
   "dependencies": {
-    "@lerna-cola/lib": "^0.1.21",
+    "@lerna-cola/lib": "^0.2.0",
     "flow-remove-types": "1.2.3",
     "fs-extra": "6.0.1",
     "globby": "8.0.1",
