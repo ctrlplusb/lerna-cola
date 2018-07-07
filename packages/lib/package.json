@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.2.1",
+  "version": "0.2.2",
   "name": "@lerna-cola/lib",
   "description": "The lib for lerna-cola packages.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
