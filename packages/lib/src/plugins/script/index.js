@@ -11,7 +11,6 @@ import type {
 } from '../../types'
 
 const R = require('ramda')
-const readPkg = require('read-pkg')
 const TerminalUtils = require('../../terminal')
 const ChildProcessUtils = require('../../childProcess')
 const PluginUtils = require('../utils')
@@ -81,9 +80,7 @@ const runScript = (task: TaskName, config: Config) => async (
     )
   }
 
-  const pkgJson = readPkg.sync(pkg.paths.packageJson)
-
-  const scriptCmd = R.path(['scripts', options.scriptName], pkgJson)
+  const scriptCmd = R.path(['scripts', options.scriptName], pkg.packageJson)
   if (!scriptCmd || R.isEmpty(scriptCmd)) {
     throw new Error(
       `Could not resolve script named "${options.scriptName}" on ${pkg.name}`,

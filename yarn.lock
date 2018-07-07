@@ -5591,7 +5591,7 @@ write-json-file@2.3.0, write-json-file@^2.2.0:
     sort-keys "^2.0.0"
     write-file-atomic "^2.0.0"
 
-write-pkg@3.2.0, write-pkg@^3.1.0:
+write-pkg@^3.1.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/write-pkg/-/write-pkg-3.2.0.tgz#0e178fe97820d389a8928bc79535dbe68c2cff21"
   dependencies:

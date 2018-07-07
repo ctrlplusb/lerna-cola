@@ -30,12 +30,10 @@
     "pify": "^3.0.0",
     "pretty-format": "^23.2.0",
     "ramda": "0.25.0",
-    "read-pkg": "4.0.1",
     "rimraf": "^2.6.2",
     "semver": "5.5.0",
     "toposort": "2.0.2",
-    "write-json-file": "2.3.0",
-    "write-pkg": "3.2.0"
+    "write-json-file": "2.3.0"
   },
   "devDependencies": {
     "flow-bin": "0.75.0",
