@@ -20,6 +20,6 @@
     "pify": "3.0.0"
   },
   "devDependencies": {
-    "flow-bin": "^0.75.0"
+    "flow-bin": "^0.76.0"
   }
 }
