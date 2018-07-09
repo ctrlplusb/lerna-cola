@@ -565,12 +565,6 @@ This plugin supports the following options:
   }
   ```
 
-- `pathAlias` (_Object_, **optional**)
-
-  Any `now` [path alias rules](https://zeit.co/docs/features/path-aliases#path-alias) to be applied to the deployment.
-
-  This is a really helpful setting, allowing you to proxy paths of your deployment to other deployments.
-
 **Example**
 
 ```javascript

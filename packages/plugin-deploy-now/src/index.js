@@ -16,29 +16,15 @@ const {
 } = require('@lerna-cola/lib')
 
 type NowSettings = {
+  alias?: string,
   forwardNpm?: boolean,
   public?: boolean,
-}
-
-type NowAliasPathRule =
-  | {|
-      dest: string,
-    |}
-  | {|
-      pathname: string,
-      method: Array<string>,
-      dest: string,
-    |}
-
-type NowPathAlias = {
-  rules: Array<NowAliasPathRule>,
 }
 
 type Options = {
   disableRemovePrevious?: boolean,
   deployTimeoutMins?: number,
   passThroughEnvVars?: Array<string>,
-  pathAlias?: NowPathAlias,
   settings?: NowSettings,
 }
 
@@ -181,26 +167,6 @@ const nowDeployPlugin: DeployPlugin = {
           } catch (err) {
             TerminalUtils.infoPkg(pkg, 'No previous deployments to remove.')
             TerminalUtils.verbosePkg(pkg, err.stack)
-          }
-        }
-
-        const { pathAlias } = options
-
-        if (pathAlias != null) {
-          const { rules } = pathAlias
-
-          if (rules != null) {
-            TerminalUtils.infoPkg(pkg, 'Attaching path alias rules...')
-            const aliasRulesPath = tempWrite.sync()
-
-            fs.outputJsonSync(aliasRulesPath, pathAlias)
-
-            await ChildProcessUtils.execPkg(pkg, 'now', [
-              'alias',
-              alias.indexOf('.') === -1 ? `${alias}.now.sh` : alias,
-              '-r',
-              aliasRulesPath,
-            ])
           }
         }
       }
