@@ -19,6 +19,7 @@ const getPackageRoots = require('./get-package-roots')
 const ColorUtils = require('../colors')
 const {
   getAllDependants,
+  getAllDependencies,
   getDependencies,
   getDependants,
   getPlugin,
@@ -181,6 +182,7 @@ const config = () => {
     // each dependant. This is so we can know which packages will all be
     // affect (either directly, or indirectly) when this package changes
     pkg.allDependants = getAllDependants(pkg, packages)
+    pkg.allDependencies = getAllDependencies(pkg, packages)
   })
 
   // Ensure there are no references to unknown packages

@@ -20,7 +20,15 @@ type QueueItem = {
   changedDependency?: Package,
 }
 
-module.exports = async function developmentService() {
+type Options = {
+  packagesFilter?: Array<string>,
+  selectPackages?: boolean,
+}
+
+module.exports = async function developmentService({
+  packagesFilter,
+  selectPackages,
+}: Options) {
   // Keep this message up here so it always comes before any others
   TerminalUtils.info('Press CTRL + C to exit')
 
@@ -29,15 +37,31 @@ module.exports = async function developmentService() {
   TerminalUtils.info('Running the pre develop hook')
   await preDevelopHook()
 
+  const filteredPackages = PackageUtils.filterPackages(packagesFilter)
+
+  const packages = selectPackages
+    ? // Ask which packages to develop if the select option was enabled
+      (await TerminalUtils.multiSelect(
+        'Which packages would you like to deploy?',
+        {
+          choices: filteredPackages.map(x => ({
+            value: x.name,
+            text: `${x.name} (${x.version})`,
+          })),
+        },
+      )).map(x => config().packageMap[x])
+    : // Else use the filtered packages
+      filteredPackages
+
   // Firstly clean build for all packages
-  await PackageUtils.cleanPackages(config().packages)
+  await PackageUtils.cleanPackages(packages)
 
   // Represents the current package being built
   let currentlyProcessing = null
 
   // Represents the build backlog queue. FIFO.
   // We will queue all the packages for the first run
-  let toProcessQueue: Array<QueueItem> = config().packages.map(pkg => ({
+  let toProcessQueue: Array<QueueItem> = packages.map(pkg => ({
     package: pkg,
     runType: 'FIRST_RUN',
   }))
@@ -64,7 +88,7 @@ module.exports = async function developmentService() {
    */
   const packageWatchers: {
     [key: string]: PackageWatcher,
-  } = config().packages.reduce(
+  } = packages.reduce(
     (acc, pkg) =>
       Object.assign(acc, {
         [pkg.name]: createPackageWatcher(onChange(pkg), pkg),
@@ -80,7 +104,7 @@ module.exports = async function developmentService() {
    */
   const packageDevelopConductors: {
     [key: string]: PackageConductor,
-  } = config().packages.reduce(
+  } = packages.reduce(
     (acc, pkg) =>
       Object.assign(acc, {
         [pkg.name]: createPackageConductor(pkg, packageWatchers[pkg.name]),

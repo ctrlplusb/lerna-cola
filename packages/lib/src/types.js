@@ -136,6 +136,7 @@ export type Package = {
   color: Chalk,
   disableSrcWatching: boolean,
   allDependants: Array<string>,
+  allDependencies: Array<string>,
   dependants: Array<string>,
   dependencies: Array<string>,
   devDependencies: Array<string>,

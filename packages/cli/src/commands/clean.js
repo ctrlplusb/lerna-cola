@@ -1,6 +1,6 @@
 // @flow
 
-const { config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
+const { TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 const pSeries = require('p-series')
 const asyncCommand = require('../lib/async-command')
 
@@ -13,11 +13,12 @@ module.exports = {
       describe: 'The packages to clean',
       type: 'array',
     }),
-  handler: asyncCommand(async () => {
+  handler: asyncCommand(async argv => {
     try {
       TerminalUtils.title('Running clean command...')
+      const packages = PackageUtils.filterPackages(argv.packages)
       const clean = pkg => () => PackageUtils.cleanPackage(pkg)
-      await pSeries(config().packages.map(clean))
+      await pSeries(packages.map(clean))
       TerminalUtils.success('Done')
     } catch (ex) {
       TerminalUtils.error('Clean failed', ex)

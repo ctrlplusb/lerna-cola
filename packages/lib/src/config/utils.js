@@ -70,11 +70,16 @@ const getAllDependants = (
   pkg: Package,
   packages: Array<Package>,
 ): Array<string> => {
-  const findPackage = name => R.find(R.propEq('name', name), packages)
+  const findPackage = name => packages.find(x => x.name === name)
 
-  // :: String -> Array<String>
   const resolveDependants = dependantName => {
     const dependant = findPackage(dependantName)
+    if (!dependant) {
+      throw new Error(
+        `Could not find dependant package "${dependantName ||
+          ''}" for package ${pkg.name}`,
+      )
+    }
     return [
       dependant.name,
       ...dependant.dependants,
@@ -89,6 +94,37 @@ const getAllDependants = (
   // which will already be in a safe build order.
   return packages
     .filter(x => !!R.find(R.equals(x.name), allDependants))
+    .map(R.prop('name'))
+}
+
+const getAllDependencies = (
+  pkg: Package,
+  packages: Array<Package>,
+): Array<string> => {
+  const findPackage = name => R.find(R.propEq('name', name), packages)
+
+  const resolveDependencies = dependencyName => {
+    const dependency = findPackage(dependencyName)
+    if (!dependency) {
+      throw new Error(
+        `Could not find dependency package "${dependencyName ||
+          ''}" for package ${pkg.name}`,
+      )
+    }
+    return [
+      dependency.name,
+      ...dependency.dependencies,
+      ...R.map(resolveDependencies, dependency.dependencies),
+    ]
+  }
+
+  // $FlowFixMe
+  const allDependencies = R.chain(resolveDependencies, pkg.dependencies)
+
+  // Let's get a sorted version of allDependencies by filtering allPackages
+  // which will already be in a safe build order.
+  return packages
+    .filter(x => !!R.find(R.equals(x.name), allDependencies))
     .map(R.prop('name'))
 }
 
@@ -117,6 +153,7 @@ const getPlugin = (
 
 module.exports = {
   getAllDependants,
+  getAllDependencies,
   getDependants,
   getDependencies,
   getPlugin,

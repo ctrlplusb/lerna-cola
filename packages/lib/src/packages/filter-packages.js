@@ -16,31 +16,45 @@ const TerminalUtils = require('../terminal')
  * @return {Promise<Array<Package>>} The resolved packages
  */
 module.exports = function filterPackages(
-  packageFilters: Array<string> = [],
+  packageFilters: ?Array<string> = [],
 ): Array<Package> {
+  const packages = config().packages
+
+  if (!packageFilters || packageFilters.length === 0) {
+    return packages
+  }
+
   TerminalUtils.verbose(
     `Resolving packages with filter [${packageFilters.join(', ')}]`,
   )
-  const packages = config().packages
-  const packagesArray = R.values(packages)
-  if (packagesArray.length === 0) {
-    throw new Error('Could not find any packages.')
+
+  const packageNames = packages.map(x => x.name)
+  const invalidFilters = R.without(packageNames, packageFilters)
+  if (invalidFilters.length > 0) {
+    throw new Error(
+      `The following packages could not be resolved:\n[${invalidFilters.join(
+        ',',
+      )}]`,
+    )
   }
-  const result =
-    packageFilters.length === 0
-      ? packagesArray
-      : (() => {
-          const packageNames = packagesArray.map(x => x.name)
-          const invalidFilters = R.without(packageNames, packageFilters)
-          if (invalidFilters.length > 0) {
-            throw new Error(
-              `The following packages could not be resolved:\n[${invalidFilters.join(
-                ',',
-              )}]`,
-            )
-          }
-          return packageFilters.map(x => config().packageMap[x])
-        })()
+
+  const targets = new Set()
+
+  packageFilters.forEach(name => {
+    targets.add(name)
+    config().packageMap[name].allDependencies.forEach(x => {
+      targets.add(x)
+    })
+  })
+
+  const filteredPackagesNames = [...targets]
+
+  // Let's get a sorted version by filtering allPackages
+  // which will already be in a safe build order.
+  const result = packages.filter(
+    x => !!filteredPackagesNames.find(name => name === x.name),
+  )
+
   TerminalUtils.verbose(`Resolved: [${result.map(R.prop('name')).join(', ')}]`)
   return result
 }
