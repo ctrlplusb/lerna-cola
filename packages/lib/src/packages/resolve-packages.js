@@ -6,18 +6,40 @@ const R = require('ramda')
 const config = require('../config')
 const TerminalUtils = require('../terminal')
 
+type Options = {
+  strict?: boolean,
+}
+
+type DefaultedOptions = {
+  strict: boolean,
+}
+
+const defaultOptions = {
+  strict: false,
+}
+
 /**
  * Filters the packages down to the given.
  *
- * @param  {Array}  [packageFilters=[]]
+ * @param  packageFilters
  *         The names of the packages to resolve. If none is specified then
  *         all of them are resolved.
+ * @param  options.strict
+ *         When enabled then only the packages within packageFilters will
+ *         be returned. Otherwise the packages plus their dependencies will
+ *         be resolved.
  *
  * @return {Promise<Array<Package>>} The resolved packages
  */
-module.exports = function filterPackages(
+module.exports = function resolvePackages(
   packageFilters: ?Array<string> = [],
+  options: Options = defaultOptions,
 ): Array<Package> {
+  const defaultedOptions: DefaultedOptions = {
+    ...defaultOptions,
+    ...options,
+  }
+
   const packages = config().packages
 
   if (!packageFilters || packageFilters.length === 0) {
@@ -42,9 +64,11 @@ module.exports = function filterPackages(
 
   packageFilters.forEach(name => {
     targets.add(name)
-    config().packageMap[name].allDependencies.forEach(x => {
-      targets.add(x)
-    })
+    if (!defaultedOptions.strict) {
+      config().packageMap[name].allDependencies.forEach(x => {
+        targets.add(x)
+      })
+    }
   })
 
   const filteredPackagesNames = [...targets]

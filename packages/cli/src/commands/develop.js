@@ -12,13 +12,18 @@ module.exports = {
     yargs
       .option('packages', {
         alias: 'p',
-        describe:
-          'The packages to develop (their dependencies will also be tracked)',
+        describe: 'The packages to develop',
         type: 'array',
       })
       .option('select', {
         alias: 's',
         describe: 'Enable selection of packages to develop',
+        type: 'boolean',
+      })
+      .option('strict', {
+        alias: 'o',
+        describe:
+          'Useful when selecting/filtering packages. When enabled only the selected/filtered packages will be tracked.',
         type: 'boolean',
       }),
   handler: asyncCommand(async argv => {
@@ -30,6 +35,7 @@ module.exports = {
       await developmentService({
         filteredPackages: argv.packages,
         selectPackages: argv.select,
+        strict: argv.strict,
       })
       TerminalUtils.success('Done')
     } catch (ex) {

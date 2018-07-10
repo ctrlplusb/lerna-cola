@@ -17,7 +17,7 @@ module.exports = {
   handler: asyncCommand(async argv => {
     try {
       TerminalUtils.title('Running clean command...')
-      const packages = PackageUtils.filterPackages(argv.packages)
+      const packages = PackageUtils.resolvePackages(argv.packages)
       const clean = pkg => () => PackageUtils.cleanPackage(pkg)
       await pSeries(packages.map(clean))
       TerminalUtils.success('Done')

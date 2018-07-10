@@ -23,11 +23,13 @@ type QueueItem = {
 type Options = {
   packagesFilter?: Array<string>,
   selectPackages?: boolean,
+  strict?: boolean,
 }
 
 module.exports = async function developmentService({
   packagesFilter,
   selectPackages,
+  strict,
 }: Options) {
   // Keep this message up here so it always comes before any others
   TerminalUtils.info('Press CTRL + C to exit')
@@ -37,24 +39,29 @@ module.exports = async function developmentService({
   TerminalUtils.info('Running the pre develop hook')
   await preDevelopHook()
 
-  const filteredPackages = PackageUtils.filterPackages(packagesFilter)
+  const resolvedPackages = PackageUtils.resolvePackages(packagesFilter, {
+    strict,
+  })
 
   TerminalUtils.verbose(`Developing packages:`)
-  TerminalUtils.verbose(filteredPackages.map(x => x.name))
+  TerminalUtils.verbose(resolvedPackages.map(x => x.name))
 
   const packages = selectPackages
     ? // Ask which packages to develop if the select option was enabled
-      (await TerminalUtils.multiSelect(
-        'Which packages would you like to deploy?',
-        {
-          choices: filteredPackages.map(x => ({
-            value: x.name,
-            text: `${x.name} (${x.version})`,
-          })),
-        },
-      )).map(x => config().packageMap[x])
+      PackageUtils.resolvePackages(
+        await TerminalUtils.multiSelect(
+          'Which packages would you like to deploy?',
+          {
+            choices: resolvedPackages.map(x => ({
+              value: x.name,
+              text: `${x.name} (${x.version})`,
+            })),
+          },
+        ),
+        { strict },
+      )
     : // Else use the filtered packages
-      filteredPackages
+      resolvedPackages
 
   // Firstly clean build for all packages
   await PackageUtils.cleanPackages(packages)
