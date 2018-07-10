@@ -39,6 +39,9 @@ module.exports = async function developmentService({
 
   const filteredPackages = PackageUtils.filterPackages(packagesFilter)
 
+  TerminalUtils.verbose(`Developing packages:`)
+  TerminalUtils.verbose(filteredPackages.map(x => x.name))
+
   const packages = selectPackages
     ? // Ask which packages to develop if the select option was enabled
       (await TerminalUtils.multiSelect(

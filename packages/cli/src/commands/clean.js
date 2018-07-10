@@ -7,6 +7,7 @@ const asyncCommand = require('../lib/async-command')
 module.exports = {
   command: 'clean',
   describe: 'Cleans the build output for packages',
+  // $FlowFixMe
   builder: yargs =>
     yargs.option('packages', {
       alias: 'p',

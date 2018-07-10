@@ -7,6 +7,7 @@ const asyncCommand = require('../lib/async-command')
 module.exports = {
   command: 'develop',
   desc: 'Starts the coordinated development service',
+  // $FlowFixMe
   builder: yargs =>
     yargs
       .option('packages', {
