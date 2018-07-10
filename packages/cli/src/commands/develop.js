@@ -20,8 +20,8 @@ module.exports = {
         describe: 'Enable selection of packages to develop',
         type: 'boolean',
       })
-      .option('strict', {
-        alias: 'o',
+      .option('exact', {
+        alias: 'e',
         describe:
           'Useful when selecting/filtering packages. When enabled only the selected/filtered packages will be tracked.',
         type: 'boolean',
@@ -33,9 +33,9 @@ module.exports = {
         process.env.NODE_ENV = 'development'
       }
       await developmentService({
-        filteredPackages: argv.packages,
+        packagesFilter: argv.packages,
         selectPackages: argv.select,
-        strict: argv.strict,
+        exact: argv.exact,
       })
       TerminalUtils.success('Done')
     } catch (ex) {

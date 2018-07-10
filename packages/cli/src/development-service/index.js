@@ -20,16 +20,16 @@ type QueueItem = {
   changedDependency?: Package,
 }
 
-type Options = {
+type Options = {|
   packagesFilter?: Array<string>,
   selectPackages?: boolean,
-  strict?: boolean,
-}
+  exact?: boolean,
+|}
 
 module.exports = async function developmentService({
   packagesFilter,
   selectPackages,
-  strict,
+  exact,
 }: Options) {
   // Keep this message up here so it always comes before any others
   TerminalUtils.info('Press CTRL + C to exit')
@@ -39,29 +39,26 @@ module.exports = async function developmentService({
   TerminalUtils.info('Running the pre develop hook')
   await preDevelopHook()
 
-  const resolvedPackages = PackageUtils.resolvePackages(packagesFilter, {
-    strict,
+  let packages = PackageUtils.resolvePackages(packagesFilter, {
+    strict: exact,
   })
 
-  TerminalUtils.verbose(`Developing packages:`)
-  TerminalUtils.verbose(resolvedPackages.map(x => x.name))
+  if (selectPackages) {
+    // Ask which packages to develop if the select option was enabled
+    const selectedPackages = await TerminalUtils.multiSelect(
+      'Which packages would you like to deploy?',
+      {
+        choices: packages.map(x => ({
+          value: x.name,
+          text: `${x.name} (${x.version})`,
+        })),
+      },
+    )
+    packages = PackageUtils.resolvePackages(selectedPackages, { strict: exact })
+  }
 
-  const packages = selectPackages
-    ? // Ask which packages to develop if the select option was enabled
-      PackageUtils.resolvePackages(
-        await TerminalUtils.multiSelect(
-          'Which packages would you like to deploy?',
-          {
-            choices: resolvedPackages.map(x => ({
-              value: x.name,
-              text: `${x.name} (${x.version})`,
-            })),
-          },
-        ),
-        { strict },
-      )
-    : // Else use the filtered packages
-      resolvedPackages
+  TerminalUtils.verbose(`Developing packages:`)
+  TerminalUtils.verbose(packages.map(x => x.name))
 
   // Firstly clean build for all packages
   await PackageUtils.cleanPackages(packages)
