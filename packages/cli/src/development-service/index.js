@@ -57,6 +57,16 @@ module.exports = async function developmentService({
     packages = PackageUtils.resolvePackages(selectedPackages, { strict: exact })
   }
 
+  const packageMap = packages.reduce((acc, cur) =>
+    Object.assign(
+      acc,
+      {
+        [cur.name]: cur,
+      },
+      {},
+    ),
+  )
+
   TerminalUtils.verbose(`Developing packages:`)
   TerminalUtils.verbose(packages.map(x => x.name))
 
@@ -77,7 +87,7 @@ module.exports = async function developmentService({
     pkg.dependants.includes(dependant.name)
 
   const getPackageDependants = (pkg: Package): Array<Package> =>
-    pkg.dependants.map(name => config().packageMap[name])
+    pkg.dependants.map(name => packageMap[name]).filter(x => x != null)
 
   const onChange = (pkg: Package) => (): void => {
     queuePackageForProcessing(pkg, 'SELF_CHANGED')
