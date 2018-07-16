@@ -87,8 +87,9 @@ const config = () => {
   let packages: Array<Package> = getPackageRoots(
     lernaColaConfig.packageSources,
   ).map(packagePath => {
+    const packageJsonPath = path.join(packagePath, './package.json')
     // $FlowFixMe
-    const packageJson = require(path.join(packagePath, './package.json'))
+    const packageJson = require(packageJsonPath)
     const packageConfig: LernaColaPackageConfig = ObjectUtils.mergeDeep(
       defaultPackageConfig,
       lernaColaConfig.packages[packageJson.name] || {},
@@ -158,7 +159,7 @@ const config = () => {
           packageConfig.srcDir,
           packageConfig.entryFile,
         ),
-        packageJson: packagePath,
+        packageJson: packageJsonPath,
         packageLockJson: path.resolve(packagePath, './package-lock.json'),
         packageNodeModules: path.resolve(packagePath, './node_modules'),
         packageRoot: packagePath,
