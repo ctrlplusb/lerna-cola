@@ -46,7 +46,7 @@ module.exports = async function developmentService({
   if (selectPackages) {
     // Ask which packages to develop if the select option was enabled
     const selectedPackages = await TerminalUtils.multiSelect(
-      'Which packages would you like to deploy?',
+      'Which packages would you like to develop?',
       {
         choices: packages.map(x => ({
           value: x.name,

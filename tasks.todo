@@ -17,8 +17,8 @@ Plugins:
   ☐ parceljs
 
 Features:
+  ☐ When deploying check that dependencies have previously been published
   ☐ Pre/Post command hooks missing on: clean, build, and deploy commands.
-  ☐ Babel plugin to look for .babelrc in package and monorepo root
   ☐ Better help on lerna-cola bin
   ☐ Command hooks + error handling of them!
    ✔ predevelop @done (2018-3-2 15:15:11)

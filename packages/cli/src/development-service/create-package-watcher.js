@@ -25,14 +25,17 @@ module.exports = function createPackageWatcher(
   }
 
   const createWatcher = () => {
-    const watcher = chokidar.watch([pkg.paths.packageRoot], {
-      ignored: pkg.paths.packageBuildOutput
-        ? pkg.paths.packageBuildOutput
-        : undefined,
-      ignoreInitial: true,
-      cwd: pkg.paths.packageRoot,
-      ignorePermissionErrors: true,
-    })
+    const watcher = chokidar.watch(
+      [pkg.paths.packageSrc, pkg.paths.packageJson],
+      {
+        ignored: pkg.paths.packageBuildOutput
+          ? pkg.paths.packageBuildOutput
+          : undefined,
+        ignoreInitial: true,
+        cwd: pkg.paths.packageRoot,
+        ignorePermissionErrors: true,
+      },
+    )
     watcher
       .on('add', onChange)
       .on('change', onChange)

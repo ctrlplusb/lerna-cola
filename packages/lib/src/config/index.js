@@ -47,7 +47,7 @@ const defaultConfig = {
       post: () => Promise.resolve(),
     },
   },
-  packageSources: ['packages/*'],
+  packageSources: undefined,
   packages: {},
 }
 
@@ -84,7 +84,9 @@ const config = () => {
         require(jsConfigPath),
   )
 
-  let packages: Array<Package> = getPackageRoots().map(packagePath => {
+  let packages: Array<Package> = getPackageRoots(
+    lernaColaConfig.packageSources,
+  ).map(packagePath => {
     // $FlowFixMe
     const packageJson = require(path.join(packagePath, './package.json'))
     const packageConfig: LernaColaPackageConfig = ObjectUtils.mergeDeep(
@@ -141,6 +143,7 @@ const config = () => {
       config: packageConfig,
       disableSrcWatching: packageConfig.disableSrcWatching,
       allDependants: [],
+      allDependencies: [],
       dependants: [],
       dependencies: [],
       devDependencies: [],

@@ -31,7 +31,7 @@ yargs
   .alias('h', 'help')
 
 if (args.length > 0) {
-  yargs.parse(process.argv.slice(2), (err, argv, output) => {
+  yargs.parse(args, (err, argv, output) => {
     TerminalUtils.verbose(argv)
     if (argv.promisedResult) {
       TerminalUtils.verbose('Waiting for async command to complete...')

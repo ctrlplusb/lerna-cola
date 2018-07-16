@@ -6,11 +6,6 @@ const pSeries = require('p-series')
 const { config, TerminalUtils, PackageUtils } = require('@lerna-cola/lib')
 
 module.exports = async function deploymentService() {
-  // First we need to make sure we have built all packages
-  await pSeries(
-    config().packages.map(pkg => () => PackageUtils.buildPackage(pkg)),
-  )
-
   // Determine which packages have a deployment plugin configured
   const packagesWithDeployConfig = config().packages.filter(
     pkg => !!pkg.plugins.deployPlugin,
@@ -40,6 +35,18 @@ module.exports = async function deploymentService() {
   // Map the package names to packages
   const packagesToDeploy = namesOfPackagesToDeploy.map(
     x => config().packageMap[x],
+  )
+
+  TerminalUtils.info('Building packages...')
+
+  // Get full package tree so we know which related packages need to be built.
+  const packagesWithDependencies = PackageUtils.resolvePackages(
+    packagesToDeploy,
+  )
+
+  // First we need to make sure we have built all packages
+  await pSeries(
+    packagesWithDependencies.map(pkg => () => PackageUtils.buildPackage(pkg)),
   )
 
   TerminalUtils.info('Deploying packages...')
