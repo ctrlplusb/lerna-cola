@@ -25,7 +25,7 @@
     "@lerna-cola/utils": "^0.1.11",
     "chokidar": "2.0.4",
     "dotenv": "6.0.0",
-    "fs-extra": "6.0.1",
+    "fs-extra": "7.0.0",
     "p-series": "1.1.0",
     "ramda": "0.25.0",
     "read-pkg": "4.0.1",

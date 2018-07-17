@@ -41,7 +41,7 @@ module.exports = async function deploymentService() {
 
   // Get full package tree so we know which related packages need to be built.
   const packagesWithDependencies = PackageUtils.resolvePackages(
-    packagesToDeploy,
+    namesOfPackagesToDeploy,
   )
 
   // First we need to make sure we have built all packages

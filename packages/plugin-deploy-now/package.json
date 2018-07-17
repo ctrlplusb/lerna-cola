@@ -16,7 +16,7 @@
     "chalk": "2.4.1",
     "dedent": "0.7.0",
     "deepmerge": "2.1.1",
-    "fs-extra": "^6.0.1",
+    "fs-extra": "^7.0.0",
     "p-whilst": "1.0.0",
     "ramda": "0.25.0",
     "temp-write": "3.4.0"
