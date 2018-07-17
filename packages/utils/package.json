@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.1.11",
+  "version": "0.1.12",
   "name": "@lerna-cola/utils",
   "description": "Helpful utilities for lerna-cola projects.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
