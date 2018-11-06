@@ -43,7 +43,6 @@ const flowBuildPlugin: CleanPlugin & BuildPlugin = {
       })
 
     return getJsFilePaths().then(filePaths => {
-      // :: string -> Promise<void>
       const transpileFile = filePath =>
         new Promise(resolve => {
           const module = path.resolve(pkg.paths.packageSrc, filePath)
