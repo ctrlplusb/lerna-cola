@@ -23,7 +23,7 @@ module.exports = function generateConfig(pkg: Package, options: Options = {}) {
     // Source maps will be useful for debugging errors in our node executions.
     sourceMaps: 'both',
 
-    presets: ArrayUtils.removeNil([
+    presets: ArrayUtils.removeNil<any>([
       [
         'env',
         {
@@ -37,7 +37,7 @@ module.exports = function generateConfig(pkg: Package, options: Options = {}) {
       'react',
     ]),
 
-    plugins: ArrayUtils.removeNil([
+    plugins: ArrayUtils.removeNil<any>([
       // const { foo, ...others } = object
       // object = { foo, ...others }
       // This plugin uses Object.assign directly.

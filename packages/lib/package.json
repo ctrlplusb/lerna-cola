@@ -18,25 +18,25 @@
   "dependencies": {
     "chalk": "2.4.1",
     "dedent": "0.7.0",
-    "deepmerge": "2.1.1",
-    "execa": "0.10.0",
+    "deepmerge": "2.2.1",
+    "execa": "1.0.0",
     "figures": "2.0.0",
     "fs-extra": "7.0.0",
     "globby": "8.0.1",
-    "inquirer": "6.1.0",
-    "load-json-file": "5.0.0",
-    "p-map": "^1.2.0",
+    "inquirer": "6.2.0",
+    "load-json-file": "5.1.0",
+    "p-map": "^2.0.0",
     "p-series": "1.1.0",
-    "pify": "^3.0.0",
-    "pretty-format": "^23.2.0",
+    "pify": "^4.0.1",
+    "pretty-format": "^23.6.0",
     "ramda": "0.25.0",
     "rimraf": "^2.6.2",
-    "semver": "5.5.0",
+    "semver": "5.6.0",
     "toposort": "2.0.2",
-    "write-json-file": "2.3.0"
+    "write-json-file": "3.0.2"
   },
   "devDependencies": {
-    "flow-bin": "0.78.0",
+    "flow-bin": "0.85.0",
     "flow-typed": "2.5.1"
   }
 }

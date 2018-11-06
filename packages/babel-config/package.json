@@ -13,7 +13,7 @@
   ],
   "dependencies": {
     "@lerna-cola/lib": "^0.4.3",
-    "babel-plugin-dynamic-import-node": "2.0.0",
+    "babel-plugin-dynamic-import-node": "2.2.0",
     "babel-plugin-inject-source-map-init": "^0.26.9",
     "babel-plugin-syntax-dynamic-import": "6.18.0",
     "babel-plugin-syntax-trailing-function-commas": "6.22.0",
@@ -23,13 +23,13 @@
     "babel-plugin-transform-react-inline-elements": "6.22.0",
     "babel-plugin-transform-react-jsx-self": "6.22.0",
     "babel-plugin-transform-react-jsx-source": "6.22.0",
-    "babel-plugin-transform-react-remove-prop-types": "0.4.14",
+    "babel-plugin-transform-react-remove-prop-types": "0.4.20",
     "babel-plugin-transform-runtime": "6.23.0",
     "babel-preset-env": "1.7.0",
     "babel-preset-react": "6.24.1",
-    "semver": "^5.5.0"
+    "semver": "^5.6.0"
   },
   "devDependencies": {
-    "flow-bin": "^0.78.0"
+    "flow-bin": "^0.85.0"
   }
 }
