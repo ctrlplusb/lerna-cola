@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.4.5",
+  "version": "0.5.0",
   "name": "@lerna-cola/cli",
   "description": "The lerna-cola CLI.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
@@ -21,8 +21,8 @@
     "url": "https://github.com/ctrlplusb/lerna-cola/issues"
   },
   "dependencies": {
-    "@lerna-cola/lib": "^0.4.3",
-    "@lerna-cola/utils": "^0.1.12",
+    "@lerna-cola/lib": "^0.5.0",
+    "@lerna-cola/utils": "^0.2.0",
     "chokidar": "2.0.4",
     "dotenv": "6.1.0",
     "fs-extra": "7.0.0",
