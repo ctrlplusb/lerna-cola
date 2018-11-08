@@ -53,7 +53,7 @@ const babelBuildPlugin: CleanPlugin & BuildPlugin = {
           if (typeof module !== 'function' || typeof module !== 'object') {
             TerminalUtils.errorPkg(
               pkg,
-              `The babel config "${packageName}" is an invalid package. Should export an object or a funciton.`,
+              `The babel config "${packageName}" is an invalid package. Should export an object or a function.`,
             )
           }
           // $FlowFixMe
@@ -73,7 +73,19 @@ const babelBuildPlugin: CleanPlugin & BuildPlugin = {
         } else {
           const packageBabelRc = path.resolve(pkg.paths.packageRoot, '.babelrc')
           const repoBabelRc = path.resolve(pkg.paths.monoRepoRoot, '.babelrc')
-          if (fs.existsSync(packageBabelRc)) {
+          const packageBabelRcJs = path.resolve(
+            pkg.paths.packageRoot,
+            '.babelrc.js',
+          )
+          const repoBabelRcJs = path.resolve(
+            pkg.paths.monoRepoRoot,
+            '.babelrc.js',
+          )
+          if (fs.existsSync(packageBabelRcJs)) {
+            resolvedConfig = fs.readFileSync(packageBabelRc)
+          } else if (fs.existsSync(repoBabelRcJs)) {
+            resolvedConfig = fs.readFileSync(repoBabelRc)
+          } else if (fs.existsSync(packageBabelRc)) {
             resolvedConfig = fs.readJsonSync(packageBabelRc)
           } else if (fs.existsSync(repoBabelRc)) {
             resolvedConfig = fs.readJsonSync(repoBabelRc)
