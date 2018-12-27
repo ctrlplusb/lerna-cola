@@ -63,7 +63,7 @@ const killChildProcessFor = (pkg: Package, task: TaskName) => {
       `Killed "${task}" script process successfully`,
     )
     if (childProcessMap[task]) {
-      delete childProcessMap[task]
+      delete childProcessMap[task][pkg.name]
     }
   })
 }
