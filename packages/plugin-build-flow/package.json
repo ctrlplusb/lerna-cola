@@ -14,12 +14,12 @@
   "dependencies": {
     "@lerna-cola/lib": "^0.5.0",
     "flow-remove-types": "1.2.3",
-    "fs-extra": "7.0.0",
+    "fs-extra": "7.0.1",
     "globby": "8.0.1",
-    "p-limit": "2.0.0",
-    "ramda": "0.25.0"
+    "p-limit": "2.1.0",
+    "ramda": "0.26.1"
   },
   "devDependencies": {
-    "flow-bin": "^0.85.0"
+    "flow-bin": "^0.89.0"
   }
 }
