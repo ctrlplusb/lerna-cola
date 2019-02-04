@@ -25,12 +25,13 @@ function killChildProcess(
     })
 
     const checkInterval = setInterval(() => {
+      TerminalUtils.verbosePkg(pkg, `Checking if killed`)
       if (killed) {
         TerminalUtils.verbosePkg(pkg, `Process killed`)
         clearInterval(checkInterval)
         resolve()
       }
-    }, 50)
+    }, 1000)
 
     childProcess.kill('SIGTERM')
   }).catch(err => {
