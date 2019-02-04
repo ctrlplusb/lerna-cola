@@ -16,27 +16,27 @@
     "build"
   ],
   "dependencies": {
-    "chalk": "2.4.1",
+    "chalk": "2.4.2",
     "dedent": "0.7.0",
-    "deepmerge": "3.0.0",
+    "deepmerge": "3.1.0",
     "execa": "1.0.0",
     "figures": "2.0.0",
     "fs-extra": "7.0.1",
-    "globby": "8.0.1",
-    "inquirer": "6.2.1",
+    "globby": "9.0.0",
+    "inquirer": "6.2.2",
     "load-json-file": "5.1.0",
     "p-map": "^2.0.0",
     "p-series": "1.1.0",
     "pify": "^4.0.1",
     "pretty-format": "^23.6.0",
     "ramda": "0.26.1",
-    "rimraf": "^2.6.2",
+    "rimraf": "^2.6.3",
     "semver": "5.6.0",
     "toposort": "2.0.2",
     "write-json-file": "3.0.2"
   },
   "devDependencies": {
-    "flow-bin": "0.89.0",
+    "flow-bin": "0.92.0",
     "flow-typed": "2.5.1"
   }
 }
