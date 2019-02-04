@@ -66,7 +66,7 @@ function verbosePkg(pkg: Package, data: any): void {
 function error(data: string, err?: Error): void {
   console.log(StringUtils.lernaColaMsg(formatError(data)))
   if (err && err.stack) {
-    console.log(StringUtils.lernaColaMsg(StringUtils.lernaColaMsg(err.stack)))
+    console.log(StringUtils.lernaColaMsg(err.stack))
   }
 }
 
