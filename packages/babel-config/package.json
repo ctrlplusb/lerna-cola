@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.3.1",
+  "version": "0.3.2",
   "name": "@lerna-cola/babel-config",
   "description": "A Babel config for the Babel build plugin for lerna-cola projects.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
@@ -12,7 +12,7 @@
     "build"
   ],
   "dependencies": {
-    "@lerna-cola/lib": "^0.5.1",
+    "@lerna-cola/lib": "^0.5.2",
     "babel-plugin-dynamic-import-node": "2.2.0",
     "babel-plugin-inject-source-map-init": "^0.26.9",
     "babel-plugin-syntax-dynamic-import": "6.18.0",
