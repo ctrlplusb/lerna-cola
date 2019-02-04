@@ -48,6 +48,12 @@ const addChildProcess = (
   childProcessMap[task][pkg.name] = processInstance
 }
 
+const removeChildProcess = (pkg: Package, task: TaskName) => {
+  if (childProcessMap[task]) {
+    delete childProcessMap[task][pkg.name]
+  }
+}
+
 const getChildProcess = (pkg: Package, task: TaskName) =>
   childProcessMap[task][pkg.name]
 
@@ -62,9 +68,7 @@ const killChildProcessFor = (pkg: Package, task: TaskName) => {
       pkg,
       `Killed "${task}" script process successfully`,
     )
-    if (childProcessMap[task]) {
-      delete childProcessMap[task][pkg.name]
-    }
+    removeChildProcess(pkg, task)
   })
 }
 
@@ -130,6 +134,8 @@ const runScript = (task: TaskName, config: Config) => async (
             pkg,
             `Stopped script "${options.scriptName}" process`,
           )
+          // ensure that the process is removed
+          removeChildProcess(pkg, task)
         })
         addChildProcess(pkg, task, childProcess)
         resolve()
