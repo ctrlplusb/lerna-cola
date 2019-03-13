@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.3.4",
+  "version": "0.3.5",
   "name": "@lerna-cola/plugin-build-babel",
   "description": "Babel plugin for lerna-cola projects.",
   "repository": "https://github.com/ctrlplusb/lerna-cola",
@@ -12,7 +12,7 @@
     "build"
   ],
   "dependencies": {
-    "@lerna-cola/lib": "^0.5.4",
+    "@lerna-cola/lib": "^0.5.5",
     "babel-core": "6.26.3",
     "fs-extra": "7.0.1",
     "globby": "9.1.0",
