@@ -15,11 +15,11 @@
     "@lerna-cola/lib": "^0.5.4",
     "babel-core": "6.26.3",
     "fs-extra": "7.0.1",
-    "globby": "9.0.0",
-    "p-limit": "2.1.0",
+    "globby": "9.1.0",
+    "p-limit": "2.2.0",
     "pify": "4.0.1"
   },
   "devDependencies": {
-    "flow-bin": "^0.92.0"
+    "flow-bin": "^0.94.0"
   }
 }

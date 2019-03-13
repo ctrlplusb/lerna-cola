@@ -23,17 +23,17 @@
   "dependencies": {
     "@lerna-cola/lib": "^0.5.4",
     "@lerna-cola/utils": "^0.2.2",
-    "chokidar": "2.0.4",
-    "dotenv": "6.2.0",
+    "chokidar": "2.1.2",
+    "dotenv": "7.0.0",
     "fs-extra": "7.0.1",
-    "p-series": "1.1.0",
+    "p-series": "2.0.0",
     "ramda": "0.26.1",
-    "read-pkg": "4.0.1",
+    "read-pkg": "5.0.0",
     "semver": "5.6.0",
-    "yargs": "12.0.5"
+    "yargs": "13.2.2"
   },
   "devDependencies": {
-    "flow-bin": "0.92.0",
+    "flow-bin": "0.94.0",
     "flow-typed": "2.5.1"
   }
 }

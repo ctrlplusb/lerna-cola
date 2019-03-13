@@ -30,6 +30,6 @@
     "semver": "^5.6.0"
   },
   "devDependencies": {
-    "flow-bin": "^0.92.0"
+    "flow-bin": "^0.94.0"
   }
 }

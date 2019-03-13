@@ -89,8 +89,21 @@ function execSync(
   ).stdout
 }
 
+function execSyncPkg(
+  pkg: Package,
+  command: string,
+  args?: Array<string> = [],
+  opts?: Object = {},
+): string {
+  const output = execSync(command, args, opts)
+  // eslint-disable-next-line no-console
+  console.log(StringUtils.packageMsg(pkg, output))
+  return output
+}
+
 module.exports = {
   exec,
   execPkg,
   execSync,
+  execSyncPkg,
 }

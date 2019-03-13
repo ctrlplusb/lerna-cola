@@ -19,6 +19,7 @@ const { PackageError } = require('../../errors')
 type Options = {|
   scriptName: string,
   runForEveryChange?: boolean,
+  runSync?: boolean,
 |}
 
 type TaskName = 'build' | 'develop' | 'deploy' | 'clean'
@@ -75,7 +76,7 @@ const killChildProcessFor = (pkg: Package, task: TaskName) => {
 const runScript = (task: TaskName, config: Config) => async (
   pkg: Package,
   options: Options,
-) => {
+): Promise<void | DevelopInstance> => {
   if (!options.scriptName || typeof options.scriptName !== 'string') {
     throw new Error(
       `No scriptName was provided for the develop configuration of ${
@@ -98,7 +99,6 @@ const runScript = (task: TaskName, config: Config) => async (
 
     const existingProcess = getChildProcess(pkg, task)
     if (existingProcess && !options.runForEveryChange) {
-      // $FlowFixMe
       return task === 'develop' ? returnAPI : undefined
     }
 
@@ -106,41 +106,47 @@ const runScript = (task: TaskName, config: Config) => async (
       await killChildProcessFor(pkg, task)
     }
 
-    await new Promise((resolve, reject) => {
-      TerminalUtils.infoPkg(pkg, `Executing script "${options.scriptName}"`)
+    const execArgs = [
+      pkg,
+      'npm',
+      ['run', options.scriptName],
+      {
+        cwd: pkg.paths.packageRoot,
+      },
+    ]
 
-      const childProcess = ChildProcessUtils.execPkg(
-        pkg,
-        'npm',
-        ['run', options.scriptName],
-        {
-          cwd: pkg.paths.packageRoot,
-        },
-      )
+    if (options.runSync) {
+      ChildProcessUtils.execSyncPkg(...execArgs)
+    } else {
+      await new Promise((resolve, reject) => {
+        TerminalUtils.infoPkg(pkg, `Executing script "${options.scriptName}"`)
 
-      childProcess.catch(err => {
-        TerminalUtils.verbosePkg(
-          pkg,
-          `Error executing script "${options.scriptName}"`,
-        )
-        reject(err)
-      })
+        const childProcess = ChildProcessUtils.execPkg(...execArgs)
 
-      // Give the catch above a tick of space, so that it can resolve any
-      // error that may have occurred
-      process.nextTick(() => {
-        childProcess.on('close', () => {
+        childProcess.catch(err => {
           TerminalUtils.verbosePkg(
             pkg,
-            `Stopped script "${options.scriptName}" process`,
+            `Error executing script "${options.scriptName}"`,
           )
-          // ensure that the process is removed
-          removeChildProcess(pkg, task)
+          reject(err)
         })
-        addChildProcess(pkg, task, childProcess)
-        resolve()
+
+        // Give the catch above a tick of space, so that it can resolve any
+        // error that may have occurred
+        process.nextTick(() => {
+          childProcess.on('close', () => {
+            TerminalUtils.verbosePkg(
+              pkg,
+              `Stopped script "${options.scriptName}" process`,
+            )
+            // ensure that the process is removed
+            removeChildProcess(pkg, task)
+          })
+          addChildProcess(pkg, task, childProcess)
+          resolve()
+        })
       })
-    })
+    }
 
     return returnAPI
   }
@@ -164,10 +170,13 @@ const runScript = (task: TaskName, config: Config) => async (
 
 const scriptPlugin: CleanPlugin & BuildPlugin & DevelopPlugin & DeployPlugin = {
   name: 'plugin-script',
+  // $FlowFixMe
   build: runScript('build', { managed: false }),
+  // $FlowFixMe
   clean: runScript('clean', { managed: false }),
   // $FlowFixMe
   develop: runScript('develop', { managed: true }),
+  // $FlowFixMe
   deploy: runScript('deploy', { managed: false }),
 }
 
