@@ -1,6 +1,8 @@
-> **Work in Progress** 👀
+
+
+> **Archived / Deprecated**
 >
-> lerna-cola is being built in parallel to a large scale production grade project, thereby getting some serious dogfooding in order to work out the kinks and settle on a useful API. Whilst we have made a lot of progress this is still very much an alpha version of the project.
+> I no longer need to use this project as the awesome team Zeit give me everything I need with their `now dev` tool and cloud platform. So happy to sunset this project as maintaining this type of project is super hard work. 😀
 
 ---
 
